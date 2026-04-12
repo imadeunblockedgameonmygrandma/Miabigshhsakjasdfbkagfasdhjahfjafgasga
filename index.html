@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unblocked Games FreezeNova</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0d0d1a;color:#fff}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#13132a;border-bottom:1px solid #2a2a4a;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:700;color:#7c6ef5;letter-spacing:-0.5px}
+.logo span{color:#fff}
+.nav-links{display:flex;gap:16px;flex-wrap:wrap}
+.nav-links a{color:#aaa;font-size:13px;text-decoration:none;cursor:pointer;transition:color 0.2s}
+.nav-links a:hover{color:#fff}
+.search-wrap{display:flex;align-items:center;background:#1e1e38;border:1px solid #3a3a5a;border-radius:8px;padding:7px 12px;gap:7px}
+.search-wrap input{background:none;border:none;outline:none;color:#fff;font-size:13px;width:160px}
+.search-wrap input::placeholder{color:#555}
+.hero{background:linear-gradient(135deg,#13132a,#0d0d2a 60%,#1a0a2e);padding:40px 20px 28px;text-align:center}
+.hero h1{font-size:28px;font-weight:700;color:#fff;margin-bottom:8px}
+.hero h1 span{color:#7c6ef5}
+.hero p{color:#888;font-size:14px}
+.cats{display:flex;gap:8px;padding:16px 20px 4px;flex-wrap:wrap}
+.cat{background:#1a1a30;border:1px solid #333;border-radius:20px;padding:6px 14px;color:#bbb;font-size:12px;cursor:pointer;transition:all 0.2s}
+.cat:hover,.cat.on{background:#7c6ef5;border-color:#7c6ef5;color:#fff}
+.sec-title{font-size:15px;font-weight:600;color:#ccc;padding:16px 20px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:0 20px 24px}
+.card{background:#1a1a2e;border:1px solid #2a2a44;border-radius:10px;overflow:hidden;cursor:pointer;transition:transform 0.18s,border-color 0.18s}
+.card:hover{transform:translateY(-3px);border-color:#7c6ef5}
+.thumb{width:100%;height:100px;object-fit:cover;display:block;background:#111}
+.cinfo{padding:8px 10px 10px}
+.ctitle{font-size:12px;font-weight:600;color:#e8e8e8;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctag{font-size:10px;color:#666;text-transform:capitalize}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#1a1a30;border:1px solid #3a3a5a;border-radius:14px;width:90%;max-width:340px;overflow:hidden}
+.modal-img{width:100%;height:160px;object-fit:cover;display:block}
+.modal-body{padding:18px 20px 20px}
+.modal-body h2{color:#fff;font-size:17px;font-weight:600;margin-bottom:6px}
+.modal-tag{display:inline-block;font-size:11px;padding:2px 10px;border-radius:10px;background:#251f44;color:#a98af5;margin-bottom:12px}
+.modal-btns{display:flex;gap:10px}
+.btn-play{flex:1;padding:9px;border-radius:8px;background:#7c6ef5;border:none;color:#fff;font-size:14px;cursor:pointer;font-weight:600;transition:opacity 0.2s}
+.btn-play:hover{opacity:0.85}
+.btn-close{padding:9px 16px;border-radius:8px;background:transparent;border:1px solid #444;color:#aaa;font-size:14px;cursor:pointer}
+.footer{text-align:center;padding:16px;color:#444;font-size:11px;border-top:1px solid #1a1a2a;background:#0a0a15}
+.no-res{color:#555;font-size:14px;padding:20px;text-align:center;grid-column:1/-1}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">FREEZE<span>NOVA</span></div>
+  <div class="nav-links">
+    <a onclick="setCategory(null,'all')">Home</a>
+    <a onclick="setCategory(null,'action')">Action</a>
+    <a onclick="setCategory(null,'arcade')">Arcade</a>
+    <a onclick="setCategory(null,'drift')">Drift</a>
+    <a onclick="setCategory(null,'io')">IO Games</a>
+    <a onclick="setCategory(null,'multiplayer')">Multiplayer</a>
+  </div>
+  <div class="search-wrap">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" placeholder="Search games..." id="q" oninput="applyFilters()">
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Unblocked Games <span>FreezeNova</span></h1>
+  <p>Free online games — play anywhere, no downloads needed.</p>
+</div>
+
+<div class="cats" id="cats">
+  <div class="cat on" onclick="setCategory(this,'all')">All</div>
+  <div class="cat" onclick="setCategory(this,'action')">Action</div>
+  <div class="cat" onclick="setCategory(this,'adventure')">Adventure</div>
+  <div class="cat" onclick="setCategory(this,'arcade')">Arcade</div>
+  <div class="cat" onclick="setCategory(this,'bike')">Bike</div>
+  <div class="cat" onclick="setCategory(this,'car')">Car</div>
+  <div class="cat" onclick="setCategory(this,'clicker')">Clicker</div>
+  <div class="cat" onclick="setCategory(this,'drift')">Drift</div>
+  <div class="cat" onclick="setCategory(this,'driving')">Driving</div>
+  <div class="cat" onclick="setCategory(this,'escape')">Escape</div>
+  <div class="cat" onclick="setCategory(this,'idle')">Idle</div>
+  <div class="cat" onclick="setCategory(this,'io')">IO Games</div>
+  <div class="cat" onclick="setCategory(this,'minecraft')">Minecraft</div>
+  <div class="cat" onclick="setCategory(this,'multiplayer')">Multiplayer</div>
+  <div class="cat" onclick="setCategory(this,'puzzle')">Puzzle</div>
+  <div class="cat" onclick="setCategory(this,'racing')">Racing</div>
+  <div class="cat" onclick="setCategory(this,'scary')">Scary</div>
+  <div class="cat" onclick="setCategory(this,'shooting')">Shooting</div>
+  <div class="cat" onclick="setCategory(this,'simulator')">Simulator</div>
+  <div class="cat" onclick="setCategory(this,'sports')">Sports</div>
+  <div class="cat" onclick="setCategory(this,'strategy')">Strategy</div>
+</div>
+
+<div class="sec-title" id="secLabel">All Games</div>
+<div class="grid" id="grid"></div>
+
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <img id="mImg" class="modal-img" src="" alt="">
+    <div class="modal-body">
+      <div class="modal-tag" id="mTag"></div>
+      <h2 id="mTitle"></h2>
+      <div class="modal-btns">
+        <button class="btn-close" onclick="document.getElementById('modal').classList.remove('open')">Cancel</button>
+        <button class="btn-play" onclick="launchGame()">Play Now ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">© 2026 FreezeNova Unblocked Games · Play free games from school or anywhere</div>
+
+<script>
+const BASE = "https://unblocked-games.s3.amazonaws.com/";
+const games = [
+  {title:"DuckCraft",tag:"minecraft",img:"media/posts/745/duckcraft-unblocked.webp",url:"duckcraft.html"},
+  {title:"Velocity Rush",tag:"skill",img:"media/posts/760/velocity-rush-unblocked.webp",url:"velocity-rush.html"},
+  {title:"Snaker io",tag:"io",img:"media/posts/759/snaker-io-unblocked.webp",url:"snaker-io.html"},
+  {title:"Geometry Vector",tag:"arcade",img:"media/posts/758/geometry-vector-unblocked.webp",url:"geometry-vector.html"},
+  {title:"Jungle Mart",tag:"idle",img:"media/posts/757/jungle-mart-unblocked.webp",url:"jungle-mart.html"},
+  {title:"Riddle School",tag:"adventure",img:"media/posts/750/riddle-school-unblocked.webp",url:"riddle-school.html"},
+  {title:"Backflip Challenge",tag:"skill",img:"media/posts/743/backflip-challenge-game.webp",url:"backflip-challenge.html"},
+  {title:"Age Of Battle",tag:"strategy",img:"media/posts/744/age-of-battle-game.webp",url:"age-of-battle.html"},
+  {title:"Dublix",tag:"multiplayer",img:"media/posts/727/dublix-game.webp",url:"dublix.html"},
+  {title:"Fall Brainrots",tag:"io",img:"media/posts/742/fall-brainrots-game.webp",url:"fall-brainrots.html"},
+  {title:"99 Nights in the Forest Survival",tag:"adventure",img:"media/posts/741/99-nights-in-the-forest-survival.webp",url:"99-nights-in-the-forest-survival.html"},
+  {title:"Steal Brainrot Heist",tag:"action",img:"media/posts/739/steal-brainrot-heist-game.webp",url:"steal-brainrot-heist.html"},
+  {title:"Run 3",tag:"arcade",img:"media/posts/740/run-3-freezenova.webp",url:"run-3.html"},
+  {title:"Steal Brainrot Duel",tag:"multiplayer",img:"media/posts/734/steal-brainrot-duel-game.webp",url:"steal-brainrot-duel.html"},
+  {title:"Steal Car Duel",tag:"car",img:"media/posts/737/Steal-car-duel.webp",url:"steal-car-duel.html"},
+  {title:"Clash of Aliens",tag:"action",img:"media/posts/738/Clash-of-Aliens.webp",url:"clash-of-aliens.html"},
+  {title:"Geometry Vibes 3D",tag:"escape",img:"media/posts/736/geometry-vibes-3d.webp",url:"geometry-vibes-3d.html"},
+  {title:"Brainrot Mega Parkour",tag:"escape",img:"media/posts/735/brainrot-mega-parkour-game.webp",url:"brainrot-mega-parkour.html"},
+  {title:"Wave Road 3D",tag:"escape",img:"media/posts/733/wave-road-3d.webp",url:"wave-road-3d.html"},
+  {title:"Italian Brainrot Baby Clicker",tag:"clicker",img:"media/posts/732/italian-brainrot-baby-clicker-game.webp",url:"italian-brainrot-baby-clicker.html"},
+  {title:"Geometry Vibes Monster",tag:"skill",img:"media/posts/731/geometry-vibes-monster-game.webp",url:"geometry-vibes-monster.html"},
+  {title:"Rocket Hero Clicker",tag:"clicker",img:"media/posts/728/rocket-hero-clicker.webp",url:"rocket-hero-clicker.html"},
+  {title:"Snow Rider 3D",tag:"arcade",img:"media/posts/680/snow-rider-game.webp",url:"snow-rider-3d.html"},
+  {title:"Chess",tag:"strategy",img:"media/posts/688/chess-freezenova.webp",url:"chess.html"},
+  {title:"Fast Food Manager",tag:"simulator",img:"media/posts/723/fast-food-manager-game.webp",url:"fast-food-manager.html"},
+  {title:"CubeCraft Survival",tag:"minecraft",img:"media/posts/722/cubecraft-survival-game.webp",url:"cubecraft-survival.html"},
+  {title:"Clash Of Skulls",tag:"strategy",img:"media/posts/713/clash-of-skulls-games.webp",url:"clash-of-skulls.html"},
+  {title:"Clash of Tanks",tag:"strategy",img:"media/posts/715/clash-of-tanks-game.webp",url:"clash-of-tanks.html"},
+  {title:"Crown Defense",tag:"strategy",img:"media/posts/717/crown-defense-game.webp",url:"crown-defense.html"},
+  {title:"Snow Rush 3D",tag:"arcade",img:"media/posts/714/snow-rush-3d.webp",url:"snow-rush-3d.html"},
+  {title:"Backflip Dive 3D",tag:"skill",img:"media/posts/719/backflip-diver-3d.webp",url:"backflip-dive-3d.html"},
+  {title:"Cool Brainrot Clicker",tag:"clicker",img:"media/posts/720/cool-brainrot-clicker-game.webp",url:"cool-brainrot-clicker.html"},
+  {title:"Geometry Vibes",tag:"escape",img:"media/posts/707/geometry-vibes-game.webp",url:"geometry-vibes.html"},
+  {title:"Basketball Stars",tag:"sports",img:"media/posts/449/Basketball-Stars-512x512.jpg",url:"basketball-stars.html"},
+  {title:"Highway Traffic",tag:"car",img:"media/posts/32/HighwayTraffic512.jpg",url:"highway-traffic.html"},
+  {title:"Traffic Jam 3D",tag:"car",img:"media/posts/693/traffic-jam-3d-game.webp",url:"traffic-jam-3d.html"},
+  {title:"Idle Breakout",tag:"clicker",img:"media/posts/496/idle-breakout.webp",url:"idle-breakout.html"},
+  {title:"Idle Mining Empire",tag:"idle",img:"media/posts/372/idle-mining-empire-512.jpg",url:"idle-mining-empire.html"},
+  {title:"Moto X3M",tag:"bike",img:"media/posts/448/Moto-X3M-Original-512x512.jpg",url:"moto-x3m.html"},
+  {title:"Extreme Run 3D",tag:"arcade",img:"media/posts/684/extreme-run-3d.webp",url:"extreme-run-3d.html"},
+  {title:"Checkout Frenzy",tag:"simulator",img:"media/posts/666/checkout-frenzy-store-simulator.webp",url:"checkout-frenzy.html"},
+  {title:"Escape Car",tag:"car",img:"media/posts/679/escape-car-game.webp",url:"escape-car.html"},
+  {title:"Tap Tap Shots",tag:"sports",img:"media/posts/406/tap-tap-shots-512.jpg",url:"tap-tap-shots.html"},
+  {title:"Su Battle Royale",tag:"io",img:"media/posts/579/battle-royale-2d.webp",url:"su-battle-royale.html"},
+  {title:"Summer Rider 3D",tag:"arcade",img:"media/posts/699/summer-rider-3d.webp",url:"summer-rider-3d.html"},
+  {title:"Brainrot Clicker",tag:"clicker",img:"media/posts/700/brainrot-clicker-game.webp",url:"brainrot-clicker.html"},
+  {title:"Fast Food Rush",tag:"simulator",img:"media/posts/671/fast-food-rush.webp",url:"fast-food-rush.html"},
+  {title:"Drift Hunters 2024",tag:"drift",img:"media/posts/444/drift-hunters-2024-freezenova.jpg",url:"drift-hunters-2024.html"},
+  {title:"Friday Night Funkin",tag:"arcade",img:"media/posts/447/friday-night-funkin-unblocked.jpg",url:"friday-night-funkin-fnf.html"},
+  {title:"Drift Hunters",tag:"drift",img:"media/posts/443/drift-hunters-game.jpg",url:"drift-hunters.html"},
+  {title:"A Small World Cup",tag:"sports",img:"media/posts/592/a-small-world-cup-512.webp",url:"a-small-world-cup.html"},
+  {title:"Watermelon Suika",tag:"arcade",img:"media/posts/681/watermelon-suika-game.webp",url:"watermelon-suika.html"},
+  {title:"Real Flight Simulator",tag:"simulator",img:"media/posts/335/512.jpg",url:"real-flight-simulator.html"},
+  {title:"Stickman GTA City",tag:"simulator",img:"media/posts/634/stickman-city-512.webp",url:"stickman-gta-city.html"},
+  {title:"Color Tunnel",tag:"arcade",img:"media/posts/711/color-tunnel-game.webp",url:"color-tunnel.html"},
+  {title:"Crazy Cattle 3D",tag:"action",img:"media/posts/687/crazy-cattle-3d-unblocked.webp",url:"crazy-cattle-3d.html"},
+  {title:"FNAF",tag:"scary",img:"media/posts/594/fnaf-512.webp",url:"fnaf.html"},
+  {title:"Ninja Obby Parkour",tag:"escape",img:"media/posts/704/ninja-obby-parkour.webp",url:"ninja-obby-parkour.html"},
+  {title:"Eggy Car",tag:"driving",img:"media/posts/682/eggy-car.webp",url:"eggy-car.html"},
+  {title:"Football Legends",tag:"sports",img:"media/posts/521/Football-Legends-game.webp",url:"football-legends.html"},
+  {title:"Drift Boss",tag:"drift",img:"media/posts/363/drift_boss_unblocked_512.jpg",url:"drift-boss.html"},
+  {title:"StackBall.io",tag:"arcade",img:"media/posts/51/stack.jpg",url:"stackballio.html"},
+  {title:"Moto X3M Winter",tag:"bike",img:"media/posts/457/Moto-X3M-Winter-512x512.jpg",url:"moto-x3m-winter.html"},
+  {title:"Archer Hero",tag:"action",img:"media/posts/346/512-2.jpg",url:"archer-hero.html"},
+  {title:"Tennis Masters",tag:"sports",img:"media/posts/454/tennis-masters-512.jpg",url:"tennis-masters.html"},
+  {title:"FNAF 2",tag:"scary",img:"media/posts/597/fnaf-2-game.webp",url:"fnaf-2.html"},
+  {title:"Stickman Ragdoll",tag:"arcade",img:"media/posts/57/stickman.jpg",url:"stickman-ragdoll.html"},
+  {title:"Moto X3M Spooky Land",tag:"bike",img:"media/posts/455/Moto-X3M-Halloween-512x512.jpg",url:"moto-x3m-spooky-land.html"},
+  {title:"Basket Hoop",tag:"sports",img:"media/posts/568/basket-hoop-512.webp",url:"basket-hoop.html"},
+  {title:"Spacebar Clicker",tag:"clicker",img:"media/posts/497/spacebark-clicker.webp",url:"spacebar-clicker.html"},
+  {title:"Edys Car Simulator",tag:"car",img:"media/posts/238/512-2.jpg",url:"edys-car-simulator.html"},
+  {title:"Italian Brainrot Survive Parkour",tag:"escape",img:"media/posts/701/italian-brainrot-survive-game.webp",url:"italian-brainrot-survive-parkour.html"},
+  {title:"Dark Forest Idle",tag:"idle",img:"media/posts/586/dark-forest-idle-512.webp",url:"dark-forest-idle.html"},
+  {title:"Block Blast",tag:"puzzle",img:"media/posts/619/block-blast.webp",url:"block-blast.html"},
+  {title:"Geometry Dash FreezeNova",tag:"escape",img:"media/posts/415/geometry-dash-freezenova.jpg",url:"geometry-dash-freezenova.html"},
+  {title:"Survival Karts",tag:"racing",img:"media/posts/625/survival-karts.webp",url:"survival-karts.html"},
+  {title:"OvO Online",tag:"multiplayer",img:"media/posts/686/ovo-online.webp",url:"ovo-online.html"},
+  {title:"Stickman Parkour",tag:"escape",img:"media/posts/573/stickman-parkour-512.webp",url:"stickman-parkour.html"},
+  {title:"Moto X3M Pool Party",tag:"bike",img:"media/posts/452/Moto-X3M-Pool-Party-512x512.jpg",url:"moto-x3m-pool-party.html"},
+  {title:"Tunnel Road",tag:"arcade",img:"media/posts/695/tunnel-road-freezenova.webp",url:"tunnel-road.html"},
+  {title:"Drift Rider",tag:"drift",img:"media/posts/428/drift-rider.jpg",url:"drift-rider.html"},
+  {title:"GTA Simulator",tag:"simulator",img:"media/posts/365/gta-simulator.jpg",url:"gta-simulator.html"},
+  {title:"Crazy Shooters 2",tag:"shooting",img:"media/posts/90/512-4.jpg",url:"crazy-shooters-2.html"},
+  {title:"Love Tester",tag:"casual",img:"media/posts/152/test.jpg",url:"love-tester.html"},
+];
+
+let activeCat = "all";
+let activeList = [];
+let activeGame = null;
+
+function setCategory(el, cat) {
+  if (el) {
+    document.querySelectorAll(".cat").forEach(c => c.classList.remove("on"));
+    el.classList.add("on");
+  } else {
+    document.querySelectorAll(".cat").forEach(c => {
+      c.classList.remove("on");
+      if (c.textContent.toLowerCase() === cat || (cat === 'all' && c.textContent === 'All')) c.classList.add("on");
+    });
+  }
+  activeCat = cat;
+  document.getElementById("secLabel").textContent = cat === "all" ? "All Games" : cat.charAt(0).toUpperCase()+cat.slice(1)+" Games";
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById("q").value.toLowerCase();
+  let list = games;
+  if (activeCat !== "all") list = list.filter(g => g.tag === activeCat);
+  if (q) list = list.filter(g => g.title.toLowerCase().includes(q) || g.tag.includes(q));
+  activeList = list;
+  render(list);
+}
+
+function render(list) {
+  const grid = document.getElementById("grid");
+  if (!list.length) { grid.innerHTML = '<div class="no-res">No games found.</div>'; return; }
+  grid.innerHTML = list.map((g,i) => `
+    <div class="card" onclick="openModal(${i})">
+      <img class="thumb" src="${BASE}${g.img}" alt="${g.title}" loading="lazy" onerror="this.style.background='#1a1a3a'">
+      <div class="cinfo">
+        <div class="ctitle">${g.title}</div>
+        <div class="ctag">${g.tag}</div>
+      </div>
+    </div>`).join("");
+}
+
+function openModal(i) {
+  activeGame = activeList[i];
+  document.getElementById("mImg").src = BASE + activeGame.img;
+  document.getElementById("mTitle").textContent = activeGame.title;
+  document.getElementById("mTag").textContent = activeGame.tag.toUpperCase();
+  document.getElementById("modal").classList.add("open");
+}
+
+function closeModal(e) {
+  if (e.target.id === "modal") document.getElementById("modal").classList.remove("open");
+}
+
+function launchGame() {
+  if (activeGame) window.open(BASE + activeGame.url, "_blank");
+  document.getElementById("modal").classList.remove("open");
+}
+
+applyFilters();
+</script>
+</body>
+</html>
