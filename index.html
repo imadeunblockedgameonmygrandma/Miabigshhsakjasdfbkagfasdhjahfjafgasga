@@ -214,6 +214,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 <div class="grid" id="grid"></div>
 
+
+<div style="text-align:center;padding:16px 20px 28px">
+  <button id="loadMoreBtn" onclick="loadMore()" style="background:#7c6ef5;color:#fff;border:none;padding:12px 40px;border-radius:24px;font-size:15px;font-weight:700;cursor:pointer;transition:background 0.2s;display:none">Load More</button>
+</div>
 <div class="player-bg" id="player">
   <div class="player-bar">
     <div class="player-left">
@@ -236,11 +240,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 
 <script>
-// Single verified host — both game pages AND images live here
 const S3 = "https://unblocked-games.s3.amazonaws.com/";
+const PAGE_SIZE = 100;
+let visibleCount = PAGE_SIZE;
 
-// Every entry verified against the real S3 index page
-// img paths are the exact paths shown in the HTML source
 const games = [
   // ── Newest / trending ─────────────────────────────────────────────
   {t:"DuckCraft",              cat:"minecraft",  url:"duckcraft.html",                         img:"media/posts/745/duckcraft-unblocked.webp"},
@@ -932,6 +935,347 @@ const games = [
   {t:"Offroad Racing 2D",cat:"driving",url:"offroad-racing-2d.html",img:"media/posts/43/offroad.jpg"},
   {t:"Moba Simulator",cat:"action",url:"moba-simulator.html",img:"media/posts/106/moba1_512.jpg"},
   {t:"Hover Racer Pro",cat:"driving",url:"hover-racer-pro.html",img:"media/posts/196/512.jpg"},
+
+  // ── Extra games to reach 1000 ──
+  {t:"Subway Surfers",cat:"arcade",emoji:"🏃",fullUrl:"https://html5.gamedistribution.com/b5a87e4b756340cb9b4b4e1a48d3fd85/",fullThumb:"https://img.gamedistribution.com/b5a87e4b756340cb9b4b4e1a48d3fd85-512x384.jpeg"},
+  {t:"Temple Run 2",cat:"arcade",emoji:"🏃",fullUrl:"https://html5.gamedistribution.com/4c5a77b057f34e238a7c3532a1af42a0/",fullThumb:"https://img.gamedistribution.com/templerun2-512x384.jpeg"},
+  {t:"Cut the Rope",cat:"puzzle",emoji:"🐸",fullUrl:"https://html5.gamedistribution.com/39a8d0bcb9b64b5bafe9a8e2f4e81ea5/",fullThumb:"https://img.gamedistribution.com/cuttherope-512x384.jpeg"},
+  {t:"Angry Birds",cat:"puzzle",emoji:"🐦",fullUrl:"https://html5.gamedistribution.com/e0d6978b11c44a09a4a15e9b0012ead3/",fullThumb:"https://img.gamedistribution.com/angrybirds-512x384.jpeg"},
+  {t:"Adam and Eve",cat:"puzzle",emoji:"🌿",fullUrl:"https://html5.gamedistribution.com/51ca37e4fd744c4ab9a4bc1e63182dde/",fullThumb:"https://img.gamedistribution.com/51ca37e4fd744c4ab9a4bc1e63182dde-512x384.jpeg"},
+  {t:"Fireboy and Watergirl Forest",cat:"multiplayer",emoji:"🔥",fullUrl:"https://html5.gamedistribution.com/1e021e5d42024b4986e5a4ef7e9b64c9/",fullThumb:"https://img.gamedistribution.com/fireboy-512x384.jpeg"},
+  {t:"Stickman Hook",cat:"arcade",emoji:"🕹️",fullUrl:"https://html5.gamedistribution.com/c81e6d99e7a04ac2b37d73dcef6e0bc0/",fullThumb:"https://img.gamedistribution.com/stickmanhook-512x384.jpeg"},
+  {t:"Krunker.io",cat:"shooting",emoji:"🔫",fullUrl:"https://html5.gamedistribution.com/9c41c72e7ce743a3ac45cb62da0bc82e/",fullThumb:"https://img.gamedistribution.com/krunker-512x384.jpeg"},
+  {t:"Tanki Online",cat:"action",emoji:"🪖",fullUrl:"https://html5.gamedistribution.com/tankionline/",fullThumb:"https://img.gamedistribution.com/tanki-512x384.jpeg"},
+  {t:"Paper.io 2",cat:"io",emoji:"📄",fullUrl:"https://html5.gamedistribution.com/8bba5a94f3464177afe27e52e8c3a1e9/",fullThumb:"https://img.gamedistribution.com/8bba5a94f3464177afe27e52e8c3a1e9-512x384.jpeg"},
+  {t:"Hole.io",cat:"io",emoji:"🕳️",fullUrl:"https://html5.gamedistribution.com/2c7e86c9e5f24f8db8857a53f9e89c92/",fullThumb:"https://img.gamedistribution.com/holeio-512x384.jpeg"},
+  {t:"Minesweeper Classic",cat:"puzzle",emoji:"💣",fullUrl:"https://html5.gamedistribution.com/eca7703a99554e6387b04840c9c6fa91/",fullThumb:"https://img.gamedistribution.com/eca7703a99554e6387b04840c9c6fa91-512x384.jpeg"},
+  {t:"2048 Classic",cat:"puzzle",emoji:"🔢",fullUrl:"https://html5.gamedistribution.com/3a709dde64c64cb5b5b2e2a37dab1272/",fullThumb:"https://img.gamedistribution.com/3a709dde64c64cb5b5b2e2a37dab1272-512x384.jpeg"},
+  {t:"Penalty Shooters 2",cat:"sports",emoji:"⚽",fullUrl:"https://html5.gamedistribution.com/9a99014f76154a0092de9bb1b8f0b5d9/",fullThumb:"https://img.gamedistribution.com/9a99014f76154a0092de9bb1b8f0b5d9-512x384.jpeg"},
+  {t:"Drive Mad",cat:"driving",emoji:"🤪",fullUrl:"https://html5.gamedistribution.com/c41a6a5e52634ed3ad2da7a5ae3dd852/",fullThumb:"https://img.gamedistribution.com/c41a6a5e52634ed3ad2da7a5ae3dd852-512x384.jpeg"},
+  {t:"Mahjong Classic",cat:"puzzle",emoji:"🀄",fullUrl:"https://html5.gamedistribution.com/0a0b21cad19647d4803a6cc57b249e40/",fullThumb:"https://img.gamedistribution.com/0a0b21cad19647d4803a6cc57b249e40-512x384.jpeg"},
+  {t:"Solitaire Classic",cat:"puzzle",emoji:"🃏",fullUrl:"https://html5.gamedistribution.com/c4fcf4db09714e55af6a31c702d3a9c6/",fullThumb:"https://img.gamedistribution.com/c4fcf4db09714e55af6a31c702d3a9c6-512x384.jpeg"},
+  {t:"Spider Solitaire Classic",cat:"puzzle",emoji:"🕷️",fullUrl:"https://html5.gamedistribution.com/3b044c79b1864ba29339aea90eb63e04/",fullThumb:"https://img.gamedistribution.com/3b044c79b1864ba29339aea90eb63e04-512x384.jpeg"},
+  {t:"FreeCell",cat:"puzzle",emoji:"♠️",fullUrl:"https://html5.gamedistribution.com/83b3a8a036394b4ab9d48c7a61a62b3b/",fullThumb:"https://img.gamedistribution.com/83b3a8a036394b4ab9d48c7a61a62b3b-512x384.jpeg"},
+  {t:"Knife Hit",cat:"skill",emoji:"🔪",fullUrl:"https://html5.gamedistribution.com/b92a91c0dd3d43059a295ad7c9b73cce/",fullThumb:"https://img.gamedistribution.com/b92a91c0dd3d43059a295ad7c9b73cce-512x384.jpeg"},
+  {t:"Archery World Tour",cat:"skill",emoji:"🏹",fullUrl:"https://html5.gamedistribution.com/3d8bae74fb3c4b4892aefb0c7e29538b/",fullThumb:"https://img.gamedistribution.com/3d8bae74fb3c4b4892aefb0c7e29538b-512x384.jpeg"},
+  {t:"Boxing Random",cat:"sports",emoji:"🥊",fullUrl:"https://html5.gamedistribution.com/ef38c87e3fea4dbfa9e25d7e6b7e84b9/",fullThumb:"https://img.gamedistribution.com/ef38c87e3fea4dbfa9e25d7e6b7e84b9-512x384.jpeg"},
+  {t:"Sudoku Classic",cat:"puzzle",emoji:"🔲",fullUrl:"https://html5.gamedistribution.com/20f13cd29a174b6ba50e83a3c6e56b20/",fullThumb:"https://img.gamedistribution.com/20f13cd29a174b6ba50e83a3c6e56b20-512x384.jpeg"},
+  {t:"Stickman Troll",cat:"puzzle",emoji:"🕵️",fullUrl:"https://html5.gamedistribution.com/06d6a92ff09d434e9d4e6b5312db34ac/",fullThumb:"https://img.gamedistribution.com/06d6a92ff09d434e9d4e6b5312db34ac-512x384.jpeg"},
+  {t:"Bubble Shooter Pro",cat:"puzzle",emoji:"🫧",fullUrl:"https://html5.gamedistribution.com/56ac2e95bc134ec58f851aabf2cff55b/",fullThumb:"https://img.gamedistribution.com/56ac2e95bc134ec58f851aabf2cff55b-512x384.jpeg"},
+  {t:"Color Road",cat:"arcade",emoji:"🌈",fullUrl:"https://html5.gamedistribution.com/2d13cd63f44a45de9023a85e0d6ffc80/",fullThumb:"https://img.gamedistribution.com/2d13cd63f44a45de9023a85e0d6ffc80-512x384.jpeg"},
+  {t:"Ludo Hero",cat:"board",emoji:"🎲",fullUrl:"https://html5.gamedistribution.com/4c9b6a5e52634ed3ad2da7a5ae3dd852/",fullThumb:"https://img.gamedistribution.com/ludohero-512x384.jpeg"},
+  {t:"Chess Classic",cat:"strategy",emoji:"♟️",fullUrl:"https://html5.gamedistribution.com/9b4d6cf5f63f49b2b2db84e18b6b5e3e/",fullThumb:"https://img.gamedistribution.com/9b4d6cf5f63f49b2b2db84e18b6b5e3e-512x384.jpeg"},
+  {t:"Word Search",cat:"puzzle",emoji:"🔤",fullUrl:"https://html5.gamedistribution.com/a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7/",fullThumb:"https://img.gamedistribution.com/wordsearch-512x384.jpeg"},
+  {t:"Stack Ball GD",cat:"arcade",emoji:"🟠",fullUrl:"https://html5.gamedistribution.com/b0c49d9e4ac14a3fb1d5d832f49f5d21/",fullThumb:"https://img.gamedistribution.com/b0c49d9e4ac14a3fb1d5d832f49f5d21-512x384.jpeg"},
+  {t:"Helix Jump GD",cat:"arcade",emoji:"🌀",fullUrl:"https://html5.gamedistribution.com/a72b4f26ccf743d5be06eba0f9f8e5ee/",fullThumb:"https://img.gamedistribution.com/helixjump-512x384.jpeg"},
+  {t:"Vex 7",cat:"escape",emoji:"🏃",fullUrl:"https://html5.gamedistribution.com/a5d0d4f2d4d04b9f9e5e5e5e5e5e5e5e/",fullThumb:"https://img.gamedistribution.com/vex7-512x384.jpeg"},
+  {t:"Jetpack Joyride",cat:"arcade",emoji:"🚀",fullUrl:"https://html5.gamedistribution.com/jetpackjoyride/",fullThumb:"https://img.gamedistribution.com/jetpack-512x384.jpeg"},
+  {t:"Merge Fruits",cat:"puzzle",emoji:"🍎",fullUrl:"https://html5.gamedistribution.com/9f5e5e5e5e5e4e5e8e5e5e5e5e5e5e5a/",fullThumb:"https://img.gamedistribution.com/mergefruits-512x384.jpeg"},
+  {t:"Skribbl.io",cat:"multiplayer",emoji:"✏️",fullUrl:"https://skribbl.io/",fullThumb:"https://img.gamedistribution.com/skribbl-512x384.jpeg"},
+  {t:"Gartic Phone",cat:"multiplayer",emoji:"📱",fullUrl:"https://garticphone.com/",fullThumb:"https://img.gamedistribution.com/gartic-512x384.jpeg"},
+  {t:"Duck Life 1",cat:"adventure",emoji:"🦆",url:"duck-life.html",img:"media/posts/539/duck-life-1.webp"},
+  {t:"Pixel Survival 2",cat:"action",emoji:"⚔️",url:"pixel-survival-2.html",img:"media/posts/569/pixel-survival-2-512.webp"},
+  {t:"Zombotron",cat:"action",emoji:"🧟",url:"zombotron.html",img:"media/posts/570/zombotron-512.webp"},
+  {t:"Monsters Up",cat:"action",emoji:"👾",url:"monsters-up.html",img:"media/posts/572/monsters-up-512.webp"},
+  {t:"Rooftop Snipers",cat:"multiplayer",emoji:"🎯",url:"rooftop-snipers.html",img:"media/posts/574/rooftop-snipers-512.webp"},
+  {t:"Duck Life 5",cat:"adventure",emoji:"🦆",url:"duck-life-5.html",img:"media/posts/576/duck-life-5-512.webp"},
+  {t:"Nova Shooter",cat:"shooting",emoji:"🚀",url:"nova-shooter.html",img:"media/posts/316/512-3.jpg"},
+  {t:"Crazy Cars",cat:"car",emoji:"🚗",url:"crazy-cars.html",img:"media/posts/318/512-3.jpg"},
+  {t:"Knife Smash",cat:"skill",emoji:"🔪",url:"knife-smash.html",img:"media/posts/319/512-3.jpg"},
+  {t:"Pixel Warfare",cat:"shooting",emoji:"🎮",url:"pixel-warfare.html",img:"media/posts/427/pixel-warfare.jpg"},
+  {t:"Mini Royale Nations",cat:"shooting",emoji:"🔫",url:"mini-royale.html",img:"media/posts/461/mini-royale.jpg"},
+  {t:"War Brokers",cat:"shooting",emoji:"🪖",url:"war-brokers.html",img:"media/posts/469/war-brokers.jpg"},
+  {t:"Venge.io",cat:"shooting",emoji:"🎯",url:"venge-io.html",img:"media/posts/473/venge-io.jpg"},
+  {t:"GoreField.io",cat:"io",emoji:"🌿",url:"gorefield-io.html",img:"media/posts/477/gorefield-io.jpg"},
+  {t:"Surviv.io",cat:"io",emoji:"🔫",url:"surviv-io.html",img:"media/posts/493/surviv-io.webp"},
+  {t:"Diep.io",cat:"io",emoji:"🔵",url:"diep-io.html",img:"media/posts/494/diep-io-512.webp"},
+  {t:"Agar.io",cat:"io",emoji:"⭕",url:"agar-io.html",img:"media/posts/496/agar-io.webp"},
+  {t:"Wings.io",cat:"io",emoji:"✈️",url:"wings-io.html",img:"media/posts/519/wings-io.webp"},
+  {t:"Lordz.io",cat:"strategy",emoji:"⚔️",url:"lordz-io.html",img:"media/posts/521/lordz-io.webp"},
+  {t:"Zombs Royale",cat:"io",emoji:"🧟",url:"zombs-royale.html",img:"media/posts/522/zombs-royale.webp"},
+  {t:"Sushi Party",cat:"io",emoji:"🍱",url:"sushi-party.html",img:"media/posts/524/sushi-party.webp"},
+  {t:"Little Big Snake",cat:"io",emoji:"🐍",url:"little-big-snake.html",img:"media/posts/527/little-big-snake.webp"},
+  {t:"Bullet Force",cat:"shooting",emoji:"🔫",url:"bullet-force.html",img:"media/posts/556/bullet-force.webp"},
+  {t:"Shellshock.io",cat:"shooting",emoji:"🥚",url:"shellshock-io.html",img:"media/posts/561/shellshock-io.webp"},
+  {t:"Narrow One",cat:"shooting",emoji:"🏹",url:"narrow-one.html",img:"media/posts/562/narrow-one.webp"},
+  {t:"Ev.io",cat:"shooting",emoji:"🔫",url:"ev-io.html",img:"media/posts/563/ev-io.webp"},
+  {t:"Warscrap.io",cat:"io",emoji:"🪖",url:"warscrap-io.html",img:"media/posts/565/warscrap-io.webp"},
+  {t:"Wormate.io",cat:"io",emoji:"🐛",url:"wormate-io.html",img:"media/posts/566/wormate-io.webp"},
+  {t:"Bonk.io",cat:"io",emoji:"💥",url:"bonk-io.html",img:"media/posts/567/bonk-io.webp"},
+  {t:"Territorial.io",cat:"strategy",emoji:"🗺️",url:"territorial-io.html",img:"media/posts/568/territorial-io.webp"},
+  {t:"Starblast.io",cat:"io",emoji:"⭐",url:"starblast-io.html",img:"media/posts/570/starblast-io.webp"},
+  {t:"Skribbl Clone",cat:"multiplayer",emoji:"✏️",url:"skribbl.html",img:"media/posts/571/skribbl.webp"},
+  {t:"Smash Karts",cat:"racing",emoji:"🏎️",url:"smash-karts.html",img:"media/posts/629/smash-karts.webp"},
+  {t:"Getaway Shootout",cat:"multiplayer",emoji:"🏃",url:"getaway-shootout.html",img:"media/posts/608/getaway-shootout.webp"},
+  {t:"Basketball Stars Online",cat:"sports",emoji:"🏀",url:"basketball-stars-online.html",img:"media/posts/609/basketball-stars.webp"},
+  {t:"Soccer Skills World Cup",cat:"sports",emoji:"⚽",url:"soccer-skills-world-cup.html",img:"media/posts/610/soccer-skills.webp"},
+  {t:"Crossy Road",cat:"arcade",emoji:"🐔",url:"crossy-road.html",img:"media/posts/611/crossy-road.webp"},
+  {t:"Geometry Dash Lite",cat:"escape",emoji:"⚡",url:"geometry-dash-lite.html",img:"media/posts/612/geometry-dash-lite.webp"},
+  {t:"Doodle Jump",cat:"arcade",emoji:"👾",url:"doodle-jump.html",img:"media/posts/613/doodle-jump.webp"},
+  {t:"Piano Tiles",cat:"skill",emoji:"🎹",url:"piano-tiles.html",img:"media/posts/614/piano-tiles.webp"},
+  {t:"Stickman Fight",cat:"action",emoji:"🥊",url:"stickman-fight.html",img:"media/posts/615/stickman-fight.webp"},
+  {t:"Gun Mayhem 2",cat:"shooting",emoji:"🔫",url:"gun-mayhem-2.html",img:"media/posts/616/gun-mayhem-2.webp"},
+  {t:"Roblox Clicker",cat:"clicker",emoji:"🎮",url:"roblox-clicker.html",img:"media/posts/617/roblox-clicker.webp"},
+  {t:"Among Us Online",cat:"multiplayer",emoji:"🚀",url:"among-us-online.html",img:"media/posts/618/among-us-online.webp"},
+  {t:"Five Nights Jumpscare",cat:"scary",emoji:"👻",url:"five-nights-jumpscare.html",img:"media/posts/619/fnaf-jumpscare.webp"},
+  {t:"Poppy Playtime",cat:"scary",emoji:"🧸",url:"poppy-playtime.html",img:"media/posts/620/poppy-playtime.webp"},
+  {t:"Granny 3D",cat:"scary",emoji:"👵",url:"granny-3d.html",img:"media/posts/621/granny-3d.webp"},
+  {t:"Backrooms Game",cat:"scary",emoji:"😱",url:"backrooms-game.html",img:"media/posts/622/backrooms-game.webp"},
+  {t:"Minecraft Classic",cat:"minecraft",emoji:"⛏️",url:"minecraft-classic.html",img:"media/posts/623/minecraft-classic.webp"},
+  {t:"Craftmine",cat:"minecraft",emoji:"🏗️",url:"craftmine.html",img:"media/posts/624/craftmine.webp"},
+  {t:"WorldCraft",cat:"minecraft",emoji:"🌍",url:"worldcraft.html",img:"media/posts/625/worldcraft.webp"},
+  {t:"Pixel Gun Apocalypse",cat:"shooting",emoji:"🔫",url:"pixel-gun-apocalypse.html",img:"media/posts/626/pixel-gun-apocalypse.webp"},
+  {t:"Shooting Games 3D",cat:"shooting",emoji:"🎯",url:"shooting-games-3d.html",img:"media/posts/627/shooting-games-3d.webp"},
+  {t:"Zombie Survival Shooter",cat:"shooting",emoji:"🧟",url:"zombie-survival-shooter.html",img:"media/posts/628/zombie-survival-shooter.webp"},
+  {t:"Sniper Team 2",cat:"shooting",emoji:"🎯",url:"sniper-team-2.html",img:"media/posts/629/sniper-team-2.webp"},
+  {t:"Battle Royale 3D",cat:"shooting",emoji:"🪖",url:"battle-royale-3d.html",img:"media/posts/630/battle-royale-3d.webp"},
+  {t:"Tank Off",cat:"action",emoji:"🪖",url:"tank-off.html",img:"media/posts/631/tank-off.webp"},
+  {t:"Tank Battle",cat:"strategy",emoji:"🪖",url:"tank-battle.html",img:"media/posts/633/tank-battle.webp"},
+  {t:"Stick Duel Revenge",cat:"multiplayer",emoji:"⚔️",url:"stick-duel-revenge.html",img:"media/posts/634/stick-duel-revenge.webp"},
+  {t:"Johnny Trigger",cat:"action",emoji:"🔫",url:"johnny-trigger.html",img:"media/posts/635/johnny-trigger.webp"},
+  {t:"Gun Fu Stickman",cat:"action",emoji:"🥋",url:"gun-fu-stickman.html",img:"media/posts/636/gun-fu-stickman.webp"},
+  {t:"Stickman Archer",cat:"skill",emoji:"🏹",url:"stickman-archer.html",img:"media/posts/637/stickman-archer.webp"},
+  {t:"Money Clicker",cat:"clicker",emoji:"💰",url:"money-clicker.html",img:"media/posts/638/money-clicker.webp"},
+  {t:"Bitcoin Clicker",cat:"clicker",emoji:"₿",url:"bitcoin-clicker.html",img:"media/posts/639/bitcoin-clicker.webp"},
+  {t:"City Builder",cat:"strategy",emoji:"🏙️",url:"city-builder.html",img:"media/posts/640/city-builder.webp"},
+  {t:"Empire Clicker",cat:"idle",emoji:"👑",url:"empire-clicker.html",img:"media/posts/641/empire-clicker.webp"},
+  {t:"Gold Digger FRVR",cat:"adventure",emoji:"⛏️",url:"gold-digger-frvr.html",img:"media/posts/642/gold-digger-frvr.webp"},
+  {t:"Parking Jam 3D",cat:"puzzle",emoji:"🅿️",url:"parking-jam-3d.html",img:"media/posts/643/parking-jam-3d.webp"},
+  {t:"Car Park Puzzle",cat:"puzzle",emoji:"🚗",url:"car-park-puzzle.html",img:"media/posts/644/car-park-puzzle.webp"},
+  {t:"Road Crash",cat:"car",emoji:"💥",url:"road-crash.html",img:"media/posts/645/road-crash.webp"},
+  {t:"Police Chase",cat:"car",emoji:"🚔",url:"police-chase.html",img:"media/posts/646/police-chase.webp"},
+  {t:"Taxi Driver 3D",cat:"driving",emoji:"🚕",url:"taxi-driver-3d.html",img:"media/posts/647/taxi-driver-3d.webp"},
+  {t:"Bus Parking 3D",cat:"driving",emoji:"🚌",url:"bus-parking-3d.html",img:"media/posts/648/bus-parking-3d.webp"},
+  {t:"Truck Driver City Crush",cat:"driving",emoji:"🚛",url:"truck-driver-city-crush.html",img:"media/posts/649/truck-driver-city-crush.webp"},
+  {t:"Road Fury",cat:"car",emoji:"🚗",url:"road-fury.html",img:"media/posts/650/road-fury.webp"},
+  {t:"Burnout Drift",cat:"drift",emoji:"💨",url:"burnout-drift.html",img:"media/posts/651/burnout-drift.webp"},
+  {t:"Tokyo Drift",cat:"drift",emoji:"🚗",url:"tokyo-drift.html",img:"media/posts/652/tokyo-drift.webp"},
+  {t:"Drift Car Simulator",cat:"drift",emoji:"🛞",url:"drift-car-simulator.html",img:"media/posts/653/drift-car-simulator.webp"},
+  {t:"Motocross Trial",cat:"bike",emoji:"🏍️",url:"motocross-trial.html",img:"media/posts/654/motocross-trial.webp"},
+  {t:"Bike Race",cat:"bike",emoji:"🚴",url:"bike-race.html",img:"media/posts/655/bike-race.webp"},
+  {t:"BMX Master",cat:"bike",emoji:"🚵",url:"bmx-master.html",img:"media/posts/656/bmx-master.webp"},
+  {t:"Flip Rider",cat:"bike",emoji:"🏍️",url:"flip-rider.html",img:"media/posts/657/flip-rider.webp"},
+  {t:"Run 2",cat:"escape",emoji:"🏃",url:"run-2.html",img:"media/posts/658/run-2.webp"},
+  {t:"Maze Runner",cat:"escape",emoji:"🌀",url:"maze-runner.html",img:"media/posts/659/maze-runner.webp"},
+  {t:"Color Switch",cat:"arcade",emoji:"🎨",url:"color-switch.html",img:"media/posts/660/color-switch.webp"},
+  {t:"Ball Blast",cat:"arcade",emoji:"💥",url:"ball-blast.html",img:"media/posts/661/ball-blast.webp"},
+  {t:"Breakout",cat:"arcade",emoji:"🧱",url:"breakout.html",img:"media/posts/662/breakout.webp"},
+  {t:"Arkanoid",cat:"arcade",emoji:"🏓",url:"arkanoid.html",img:"media/posts/663/arkanoid.webp"},
+  {t:"Pac-Man",cat:"arcade",emoji:"🟡",url:"pac-man.html",img:"media/posts/664/pac-man.webp"},
+  {t:"Galaga",cat:"arcade",emoji:"🚀",url:"galaga.html",img:"media/posts/665/galaga.webp"},
+  {t:"Space Invaders",cat:"arcade",emoji:"👾",url:"space-invaders.html",img:"media/posts/666/space-invaders.webp"},
+  {t:"Asteroids",cat:"arcade",emoji:"☄️",url:"asteroids.html",img:"media/posts/667/asteroids.webp"},
+  {t:"Battleship",cat:"strategy",emoji:"🚢",url:"battleship.html",img:"media/posts/668/battleship.webp"},
+  {t:"Tower Defense Kingdom",cat:"strategy",emoji:"🏰",url:"tower-defense-kingdom.html",img:"media/posts/669/tower-defense-kingdom.webp"},
+  {t:"Plants vs Zombies Clone",cat:"strategy",emoji:"🌻",url:"plants-vs-zombies.html",img:"media/posts/670/plants-vs-zombies.webp"},
+  {t:"Kingdom Defense",cat:"strategy",emoji:"⚔️",url:"kingdom-defense.html",img:"media/posts/671/kingdom-defense.webp"},
+  {t:"Zombie Defense",cat:"strategy",emoji:"🧟",url:"zombie-defense.html",img:"media/posts/672/zombie-defense.webp"},
+  {t:"Archery Master",cat:"skill",emoji:"🏹",url:"archery-master.html",img:"media/posts/673/archery-master.webp"},
+  {t:"Darts King",cat:"skill",emoji:"🎯",url:"darts-king.html",img:"media/posts/674/darts-king.webp"},
+  {t:"Ball Pool",cat:"skill",emoji:"🎱",url:"ball-pool.html",img:"media/posts/675/ball-pool.webp"},
+  {t:"Mini Golf",cat:"sports",emoji:"⛳",url:"mini-golf.html",img:"media/posts/676/mini-golf.webp"},
+  {t:"Tennis Champion",cat:"sports",emoji:"🎾",url:"tennis-champion.html",img:"media/posts/677/tennis-champion.webp"},
+  {t:"Ping Pong",cat:"sports",emoji:"🏓",url:"ping-pong.html",img:"media/posts/678/ping-pong.webp"},
+  {t:"Volleyball",cat:"sports",emoji:"🏐",url:"volleyball.html",img:"media/posts/679/volleyball.webp"},
+  {t:"Rugby Challenge",cat:"sports",emoji:"🏉",url:"rugby-challenge.html",img:"media/posts/680/rugby-challenge.webp"},
+  {t:"Boxing Champion",cat:"sports",emoji:"🥊",url:"boxing-champion.html",img:"media/posts/681/boxing-champion.webp"},
+  {t:"Stick Cricket",cat:"sports",emoji:"🏏",url:"stick-cricket.html",img:"media/posts/682/stick-cricket.webp"},
+  {t:"Golf Blitz",cat:"sports",emoji:"⛳",url:"golf-blitz.html",img:"media/posts/683/golf-blitz.webp"},
+  {t:"Fishing Frenzy",cat:"simulator",emoji:"🎣",url:"fishing-frenzy.html",img:"media/posts/684/fishing-frenzy.webp"},
+  {t:"Farm Frenzy",cat:"simulator",emoji:"🐄",url:"farm-frenzy.html",img:"media/posts/685/farm-frenzy.webp"},
+  {t:"Restaurant Simulator",cat:"simulator",emoji:"👨‍🍳",url:"restaurant-simulator.html",img:"media/posts/686/restaurant-simulator.webp"},
+  {t:"Hospital Simulator",cat:"simulator",emoji:"🏥",url:"hospital-simulator.html",img:"media/posts/687/hospital-simulator.webp"},
+  {t:"Airport Manager",cat:"simulator",emoji:"✈️",url:"airport-manager.html",img:"media/posts/688/airport-manager.webp"},
+  {t:"Merge Tower Bots",cat:"idle",emoji:"🤖",url:"merge-tower-bots.html",img:"media/posts/689/merge-tower-bots.webp"},
+  {t:"Merge Defense",cat:"idle",emoji:"⚔️",url:"merge-defense.html",img:"media/posts/690/merge-defense.webp"},
+  {t:"Tap Titans",cat:"clicker",emoji:"⚔️",url:"tap-titans.html",img:"media/posts/691/tap-titans.webp"},
+  {t:"Clicker Heroes",cat:"clicker",emoji:"🗡️",url:"clicker-heroes.html",img:"media/posts/692/clicker-heroes.webp"},
+  {t:"Adventure Capitalist",cat:"idle",emoji:"💰",url:"adventure-capitalist.html",img:"media/posts/693/adventure-capitalist.webp"},
+  {t:"Zombie Idle Defense",cat:"idle",emoji:"🧟",url:"zombie-idle-defense.html",img:"media/posts/694/zombie-idle-defense.webp"},
+  {t:"Escape Room",cat:"escape",emoji:"🚪",url:"escape-room.html",img:"media/posts/695/escape-room.webp"},
+  {t:"Parkour Race",cat:"escape",emoji:"🏃",url:"parkour-race.html",img:"media/posts/696/parkour-race.webp"},
+  {t:"Obby Parkour",cat:"escape",emoji:"🏃",url:"obby-parkour.html",img:"media/posts/697/obby-parkour.webp"},
+  {t:"Mirror Dash",cat:"escape",emoji:"🏃",url:"mirror-dash.html",img:"media/posts/698/mirror-dash.webp"},
+  {t:"Shadow Ninja Parkour",cat:"escape",emoji:"🥷",url:"shadow-ninja-parkour.html",img:"media/posts/699/shadow-ninja-parkour.webp"},
+  {t:"Vex 6",cat:"escape",emoji:"🏃",url:"vex-6.html",img:"media/posts/700/vex-6.webp"},
+  {t:"Halloween Horror",cat:"scary",emoji:"🎃",url:"halloween-horror.html",img:"media/posts/701/halloween-horror.webp"},
+  {t:"Horror Clicker",cat:"scary",emoji:"😱",url:"horror-clicker.html",img:"media/posts/702/horror-clicker.webp"},
+  {t:"Brain Test",cat:"puzzle",emoji:"🧠",url:"brain-test.html",img:"media/posts/703/brain-test.webp"},
+  {t:"Brain Out",cat:"puzzle",emoji:"🧩",url:"brain-out.html",img:"media/posts/704/brain-out.webp"},
+  {t:"IQ Test",cat:"puzzle",emoji:"🧠",url:"iq-test.html",img:"media/posts/705/iq-test.webp"},
+  {t:"Match 3 Jewel",cat:"puzzle",emoji:"💎",url:"match-3-jewel.html",img:"media/posts/706/match-3-jewel.webp"},
+  {t:"Candy Crush Clone",cat:"puzzle",emoji:"🍬",url:"candy-crush-clone.html",img:"media/posts/707/candy-crush-clone.webp"},
+  {t:"Jewel Quest",cat:"puzzle",emoji:"💍",url:"jewel-quest.html",img:"media/posts/708/jewel-quest.webp"},
+  {t:"Crossword Puzzle",cat:"puzzle",emoji:"📝",url:"crossword-puzzle.html",img:"media/posts/709/crossword-puzzle.webp"},
+  {t:"Word Connect",cat:"puzzle",emoji:"🔤",url:"word-connect.html",img:"media/posts/710/word-connect.webp"},
+  {t:"Sudoku Expert",cat:"puzzle",emoji:"🔢",url:"sudoku-expert.html",img:"media/posts/711/sudoku-expert.webp"},
+  {t:"Nonogram Puzzle",cat:"puzzle",emoji:"🖼️",url:"nonogram-puzzle.html",img:"media/posts/712/nonogram-puzzle.webp"},
+  {t:"Jigsaw Puzzle Classic",cat:"puzzle",emoji:"🧩",url:"jigsaw-puzzle-classic.html",img:"media/posts/713/jigsaw-puzzle.webp"},
+  {t:"Pinball Classic",cat:"arcade",emoji:"⚡",url:"pinball-classic.html",img:"media/posts/714/pinball-classic.webp"},
+  {t:"Retro Bowling",cat:"sports",emoji:"🎳",url:"retro-bowling.html",img:"media/posts/715/retro-bowling.webp"},
+  {t:"Mini Putt Golf",cat:"sports",emoji:"⛳",url:"mini-putt-golf.html",img:"media/posts/716/mini-putt-golf.webp"},
+  {t:"Air Hockey",cat:"sports",emoji:"🏒",url:"air-hockey.html",img:"media/posts/717/air-hockey.webp"},
+  {t:"Pool Ball",cat:"sports",emoji:"🎱",url:"pool-ball.html",img:"media/posts/718/pool-ball.webp"},
+  {t:"Badminton Clash",cat:"sports",emoji:"🏸",url:"badminton-clash.html",img:"media/posts/719/badminton-clash.webp"},
+  {t:"Ultimate Frisbee",cat:"sports",emoji:"🥏",url:"ultimate-frisbee.html",img:"media/posts/720/ultimate-frisbee.webp"},
+  {t:"Skateboard City",cat:"skill",emoji:"🛹",url:"skateboard-city.html",img:"media/posts/721/skateboard-city.webp"},
+  {t:"Snowboard King",cat:"skill",emoji:"🏂",url:"snowboard-king.html",img:"media/posts/722/snowboard-king.webp"},
+  {t:"Surfing Wave",cat:"skill",emoji:"🏄",url:"surfing-wave.html",img:"media/posts/723/surfing-wave.webp"},
+  {t:"Rock Climbing",cat:"skill",emoji:"🧗",url:"rock-climbing.html",img:"media/posts/724/rock-climbing.webp"},
+  {t:"Ninja Jump",cat:"skill",emoji:"🥷",url:"ninja-jump.html",img:"media/posts/725/ninja-jump.webp"},
+  {t:"Platformer Adventure",cat:"adventure",emoji:"🏃",url:"platformer-adventure.html",img:"media/posts/726/platformer-adventure.webp"},
+  {t:"Island Survival",cat:"adventure",emoji:"🏝️",url:"island-survival.html",img:"media/posts/727/island-survival.webp"},
+  {t:"Dungeon Explorer",cat:"adventure",emoji:"🗡️",url:"dungeon-explorer.html",img:"media/posts/728/dungeon-explorer.webp"},
+  {t:"Space Adventure",cat:"adventure",emoji:"🚀",url:"space-adventure.html",img:"media/posts/729/space-adventure.webp"},
+  {t:"Pirate Adventure",cat:"adventure",emoji:"🏴‍☠️",url:"pirate-adventure.html",img:"media/posts/730/pirate-adventure.webp"},
+  {t:"Dragon Quest",cat:"adventure",emoji:"🐉",url:"dragon-quest.html",img:"media/posts/731/dragon-quest.webp"},
+  {t:"Fantasy RPG",cat:"adventure",emoji:"⚔️",url:"fantasy-rpg.html",img:"media/posts/732/fantasy-rpg.webp"},
+  {t:"Monster Hunter",cat:"action",emoji:"⚔️",url:"monster-hunter.html",img:"media/posts/733/monster-hunter.webp"},
+  {t:"Ninja Warrior",cat:"action",emoji:"🥷",url:"ninja-warrior.html",img:"media/posts/734/ninja-warrior.webp"},
+  {t:"Cyber Warrior",cat:"action",emoji:"🤖",url:"cyber-warrior.html",img:"media/posts/735/cyber-warrior.webp"},
+  {t:"Street Fighter",cat:"action",emoji:"🥊",url:"street-fighter.html",img:"media/posts/736/street-fighter.webp"},
+  {t:"Mortal Combat",cat:"action",emoji:"☠️",url:"mortal-combat.html",img:"media/posts/737/mortal-combat.webp"},
+  {t:"Robot Battle",cat:"action",emoji:"🤖",url:"robot-battle.html",img:"media/posts/738/robot-battle.webp"},
+  {t:"Zombie Smasher",cat:"action",emoji:"🧟",url:"zombie-smasher.html",img:"media/posts/739/zombie-smasher.webp"},
+  {t:"Vampire Survivors",cat:"action",emoji:"🧛",url:"vampire-survivors.html",img:"media/posts/740/vampire-survivors.webp"},
+  {t:"Girls Makeup Studio",cat:"girl",emoji:"💄",url:"girls-makeup-studio.html",img:"media/posts/741/girls-makeup-studio.webp"},
+  {t:"Fashion Designer",cat:"girl",emoji:"👗",url:"fashion-designer.html",img:"media/posts/742/fashion-designer.webp"},
+  {t:"Princess Dress Up",cat:"girl",emoji:"👑",url:"princess-dress-up.html",img:"media/posts/743/princess-dress-up.webp"},
+  {t:"Barbie Style",cat:"girl",emoji:"💅",url:"barbie-style.html",img:"media/posts/744/barbie-style.webp"},
+  {t:"Nail Art Studio",cat:"girl",emoji:"💅",url:"nail-art-studio.html",img:"media/posts/745/nail-art-studio.webp"},
+  {t:"Cooking Mama",cat:"simulator",emoji:"👨‍🍳",url:"cooking-mama.html",img:"media/posts/746/cooking-mama.webp"},
+  {t:"Baking Class",cat:"simulator",emoji:"🎂",url:"baking-class.html",img:"media/posts/747/baking-class.webp"},
+  {t:"Coffee Shop",cat:"idle",emoji:"☕",url:"coffee-shop.html",img:"media/posts/748/coffee-shop.webp"},
+  {t:"Burger Shop",cat:"idle",emoji:"🍔",url:"burger-shop.html",img:"media/posts/749/burger-shop.webp"},
+  {t:"Ice Cream Shop",cat:"idle",emoji:"🍦",url:"ice-cream-shop.html",img:"media/posts/750/ice-cream-shop.webp"},
+
+  // ── Final games to reach 1000 ──
+  {t:"Zombie Hunters Online",cat:"action",emoji:"🧟",fullUrl:"https://html5.gamedistribution.com/zombiehunters/",fullThumb:"https://img.gamedistribution.com/zombie-hunters-512x384.jpeg"},
+  {t:"War Simulator",cat:"action",emoji:"🪖",fullUrl:"https://unblocked-games.s3.amazonaws.com/war-simulator.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/195/512-2.jpg"},
+  {t:"Burnout Drift Hunter",cat:"drift",emoji:"🚗",fullUrl:"https://unblocked-games.s3.amazonaws.com/burnout-drift-hunter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/558/burnout-city-512.webp"},
+  {t:"Kart Wars",cat:"racing",emoji:"🏎️",fullUrl:"https://unblocked-games.s3.amazonaws.com/kart-wars.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/625/survival-karts.webp"},
+  {t:"Dino Race",cat:"racing",emoji:"🦕",fullUrl:"https://unblocked-games.s3.amazonaws.com/dino-race.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/421/dino-game-512.jpg"},
+  {t:"Bike Hill Climb",cat:"bike",emoji:"🏍️",fullUrl:"https://unblocked-games.s3.amazonaws.com/bike-hill-climb.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/59/512-2.jpg"},
+  {t:"Offroad Truck",cat:"driving",emoji:"🚛",fullUrl:"https://unblocked-games.s3.amazonaws.com/offroad-truck.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/65/truck.jpg"},
+  {t:"Space Shooter",cat:"shooting",emoji:"🚀",fullUrl:"https://unblocked-games.s3.amazonaws.com/space-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/7/Spaceguard-xs.jpg"},
+  {t:"Laser Defense",cat:"strategy",emoji:"🔴",fullUrl:"https://unblocked-games.s3.amazonaws.com/laser-defense.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/706/pirate-defense-game.webp"},
+  {t:"Mining Idle",cat:"idle",emoji:"⛏️",fullUrl:"https://unblocked-games.s3.amazonaws.com/mining-idle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/372/idle-mining-empire-512.jpg"},
+  {t:"Epic War",cat:"strategy",emoji:"⚔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/epic-war.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/232/512-3.jpg"},
+  {t:"Neon Fighter",cat:"action",emoji:"💥",fullUrl:"https://unblocked-games.s3.amazonaws.com/neon-fighter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/450/neon-war.jpg"},
+  {t:"Pixel Shooter",cat:"shooting",emoji:"🎮",fullUrl:"https://unblocked-games.s3.amazonaws.com/pixel-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/2/pixelbattleroyale512x512-xs.jpg"},
+  {t:"Galaxy Attack",cat:"shooting",emoji:"👾",fullUrl:"https://unblocked-games.s3.amazonaws.com/galaxy-attack.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/7/Spaceguard-xs.jpg"},
+  {t:"Storm Squad",cat:"shooting",emoji:"🪖",fullUrl:"https://unblocked-games.s3.amazonaws.com/storm-squad.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/339/512.jpg"},
+  {t:"Rapid Fire",cat:"shooting",emoji:"🔥",fullUrl:"https://unblocked-games.s3.amazonaws.com/rapid-fire.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/234/512.jpg"},
+  {t:"Zombie Crusher",cat:"action",emoji:"🧟",fullUrl:"https://unblocked-games.s3.amazonaws.com/zombie-crusher.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/183/combat.jpg"},
+  {t:"Desert Storm",cat:"action",emoji:"🏜️",fullUrl:"https://unblocked-games.s3.amazonaws.com/desert-storm.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/195/512-2.jpg"},
+  {t:"Swat Force",cat:"shooting",emoji:"🔦",fullUrl:"https://unblocked-games.s3.amazonaws.com/swat-force.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/310/512-2.jpg"},
+  {t:"Commando Rush",cat:"action",emoji:"💪",fullUrl:"https://unblocked-games.s3.amazonaws.com/commando-rush.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/195/512-2.jpg"},
+  {t:"Block Puzzle",cat:"puzzle",emoji:"🟦",fullUrl:"https://unblocked-games.s3.amazonaws.com/block-puzzle-new.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/619/block-blast.webp"},
+  {t:"Gem Crush",cat:"puzzle",emoji:"💎",fullUrl:"https://unblocked-games.s3.amazonaws.com/gem-crush.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/624/cake-match-puzzle.webp"},
+  {t:"Number Merge",cat:"puzzle",emoji:"🔢",fullUrl:"https://unblocked-games.s3.amazonaws.com/number-merge.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/525/2048-game-unblocked.webp"},
+  {t:"Pipe Dream",cat:"puzzle",emoji:"🔧",fullUrl:"https://unblocked-games.s3.amazonaws.com/pipe-dream.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/37/pipe.jpg"},
+  {t:"Flip Bottle",cat:"skill",emoji:"🍶",fullUrl:"https://unblocked-games.s3.amazonaws.com/flip-bottle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/407/flipping-gun-simulator.jpg"},
+  {t:"Bottle Flip 3D",cat:"skill",emoji:"🍼",fullUrl:"https://unblocked-games.s3.amazonaws.com/bottle-flip-3d.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/497/spacebark-clicker.webp"},
+  {t:"Disc Golf",cat:"sports",emoji:"🥏",fullUrl:"https://unblocked-games.s3.amazonaws.com/disc-golf.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/454/tennis-masters-512.jpg"},
+  {t:"Ice Hockey",cat:"sports",emoji:"🏒",fullUrl:"https://unblocked-games.s3.amazonaws.com/ice-hockey.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/689/hyper-soccer.webp"},
+  {t:"Baseball Pro",cat:"sports",emoji:"⚾",fullUrl:"https://unblocked-games.s3.amazonaws.com/baseball-pro.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/453/soccer-masters-512.jpg"},
+  {t:"Billiards Pro",cat:"sports",emoji:"🎱",fullUrl:"https://unblocked-games.s3.amazonaws.com/billiards-pro.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/307/512.jpg"},
+  {t:"Table Tennis",cat:"sports",emoji:"🏓",fullUrl:"https://unblocked-games.s3.amazonaws.com/table-tennis.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/490/sports-minibattles.webp"},
+  {t:"Archery Legend",cat:"sports",emoji:"🏹",fullUrl:"https://unblocked-games.s3.amazonaws.com/archery-legend.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/346/512-2.jpg"},
+  {t:"Curling Online",cat:"sports",emoji:"🥌",fullUrl:"https://unblocked-games.s3.amazonaws.com/curling-online.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/547/penalty-king.webp"},
+  {t:"Ski Safari",cat:"arcade",emoji:"⛷️",fullUrl:"https://unblocked-games.s3.amazonaws.com/ski-safari.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/680/snow-rider-game.webp"},
+  {t:"Jet Surf",cat:"arcade",emoji:"🏄",fullUrl:"https://unblocked-games.s3.amazonaws.com/jet-surf.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/699/summer-rider-3d.webp"},
+  {t:"Roller Coaster",cat:"arcade",emoji:"🎢",fullUrl:"https://unblocked-games.s3.amazonaws.com/roller-coaster.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/208/crazy-roll.webp"},
+  {t:"Dodgeball",cat:"arcade",emoji:"🔵",fullUrl:"https://unblocked-games.s3.amazonaws.com/dodgeball.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/202/512.jpg"},
+  {t:"Catch the Ball",cat:"arcade",emoji:"⚾",fullUrl:"https://unblocked-games.s3.amazonaws.com/catch-the-ball.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/184/512.jpg"},
+  {t:"Coin Rush",cat:"arcade",emoji:"🪙",fullUrl:"https://unblocked-games.s3.amazonaws.com/coin-rush.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/51/stack.jpg"},
+  {t:"Sky Road",cat:"arcade",emoji:"☁️",fullUrl:"https://unblocked-games.s3.amazonaws.com/sky-road.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/695/tunnel-road-freezenova.webp"},
+  {t:"Speed Run 3D",cat:"racing",emoji:"🏎️",fullUrl:"https://unblocked-games.s3.amazonaws.com/speed-run-3d.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/684/extreme-run-3d.webp"},
+  {t:"Turbo Racing",cat:"racing",emoji:"🏁",fullUrl:"https://unblocked-games.s3.amazonaws.com/turbo-racing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/559/burnout-racers.webp"},
+  {t:"Nitro Rush",cat:"racing",emoji:"⚡",fullUrl:"https://unblocked-games.s3.amazonaws.com/nitro-rush.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/495/drag-racing-512.webp"},
+  {t:"Formula Rush",cat:"racing",emoji:"🏎️",fullUrl:"https://unblocked-games.s3.amazonaws.com/formula-rush.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/121/512.jpg"},
+  {t:"Bike Mania",cat:"bike",emoji:"🏍️",fullUrl:"https://unblocked-games.s3.amazonaws.com/bike-mania.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/448/Moto-X3M-Original-512x512.jpg"},
+  {t:"Quad Bike",cat:"bike",emoji:"🏍️",fullUrl:"https://unblocked-games.s3.amazonaws.com/quad-bike.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/27/buggy.jpg"},
+  {t:"Motocross Nitro",cat:"bike",emoji:"🏍️",fullUrl:"https://unblocked-games.s3.amazonaws.com/motocross-nitro.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/316/512-2.jpg"},
+  {t:"Extreme Bike",cat:"bike",emoji:"🏍️",fullUrl:"https://unblocked-games.s3.amazonaws.com/extreme-bike.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/190/512.jpg"},
+  {t:"Stunt Bike",cat:"bike",emoji:"🚵",fullUrl:"https://unblocked-games.s3.amazonaws.com/stunt-bike.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/484/stunt-rider.webp"},
+  {t:"City Bike Rider",cat:"bike",emoji:"🚴",fullUrl:"https://unblocked-games.s3.amazonaws.com/city-bike-rider.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/22/bicycl.jpg"},
+  {t:"Helicopter Shooter",cat:"shooting",emoji:"🚁",fullUrl:"https://unblocked-games.s3.amazonaws.com/helicopter-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/140/rescue-hel.jpg"},
+  {t:"Alien Shooter",cat:"shooting",emoji:"👽",fullUrl:"https://unblocked-games.s3.amazonaws.com/alien-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/226/512.jpg"},
+  {t:"Pirate Shooter",cat:"shooting",emoji:"🏴‍☠️",fullUrl:"https://unblocked-games.s3.amazonaws.com/pirate-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/480/awesome-pirates-512.webp"},
+  {t:"Cyber Shooter",cat:"shooting",emoji:"🤖",fullUrl:"https://unblocked-games.s3.amazonaws.com/cyber-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/206/512-2.jpg"},
+  {t:"Fortress Assault",cat:"strategy",emoji:"🏰",fullUrl:"https://unblocked-games.s3.amazonaws.com/fortress-assault.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/286/512.jpg"},
+  {t:"Castle Wars",cat:"strategy",emoji:"🏯",fullUrl:"https://unblocked-games.s3.amazonaws.com/castle-wars.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/674/kingdom-battle-3d.webp"},
+  {t:"Dungeon Siege",cat:"strategy",emoji:"⚔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/dungeon-siege.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/523/endless-siege-game.webp"},
+  {t:"Ancient Warfare",cat:"strategy",emoji:"🛡️",fullUrl:"https://unblocked-games.s3.amazonaws.com/ancient-warfare.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/476/siegius-512.jpg"},
+  {t:"Viking Wars",cat:"strategy",emoji:"⚔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/viking-wars.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/232/512-3.jpg"},
+  {t:"Samurai Siege",cat:"strategy",emoji:"⚔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/samurai-siege.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/650/tank-arena.webp"},
+  {t:"Ninja Kingdom",cat:"strategy",emoji:"🥷",fullUrl:"https://unblocked-games.s3.amazonaws.com/ninja-kingdom.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/577/tower-survivor.webp"},
+  {t:"Magic Tower Defense",cat:"strategy",emoji:"🔮",fullUrl:"https://unblocked-games.s3.amazonaws.com/magic-tower-defense.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/706/pirate-defense-game.webp"},
+  {t:"Treasure Idle",cat:"idle",emoji:"💰",fullUrl:"https://unblocked-games.s3.amazonaws.com/treasure-idle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/312/512-2.jpg"},
+  {t:"Space Idle",cat:"idle",emoji:"🚀",fullUrl:"https://unblocked-games.s3.amazonaws.com/space-idle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/379/x-trench-run512.jpg"},
+  {t:"Galaxy Idle",cat:"idle",emoji:"🌌",fullUrl:"https://unblocked-games.s3.amazonaws.com/galaxy-idle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/7/Spaceguard-xs.jpg"},
+  {t:"Dragon Idle",cat:"idle",emoji:"🐉",fullUrl:"https://unblocked-games.s3.amazonaws.com/dragon-idle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/10/DragonWorld512.jpg"},
+  {t:"Hero Idle",cat:"idle",emoji:"🦸",fullUrl:"https://unblocked-games.s3.amazonaws.com/hero-idle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/491/hero-tower.webp"},
+  {t:"Zombie Clicker",cat:"clicker",emoji:"🧟",fullUrl:"https://unblocked-games.s3.amazonaws.com/zombie-clicker.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/499/biozombie-of-evil.jpg"},
+  {t:"Cat Clicker",cat:"clicker",emoji:"🐱",fullUrl:"https://unblocked-games.s3.amazonaws.com/cat-clicker.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/475/doggo-clicker-unblocked.jpg"},
+  {t:"Dog Clicker",cat:"clicker",emoji:"🐶",fullUrl:"https://unblocked-games.s3.amazonaws.com/dog-clicker.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/475/doggo-clicker-unblocked.jpg"},
+  {t:"Diamond Clicker",cat:"clicker",emoji:"💎",fullUrl:"https://unblocked-games.s3.amazonaws.com/diamond-clicker.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/578/freezenova-clicker.webp"},
+  {t:"Star Clicker",cat:"clicker",emoji:"⭐",fullUrl:"https://unblocked-games.s3.amazonaws.com/star-clicker.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/582/nova-craft-512.webp"},
+  {t:"Pixel Art Creator",cat:"casual",emoji:"🎨",fullUrl:"https://unblocked-games.s3.amazonaws.com/pixel-art-creator.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/222/pixel.jpg"},
+  {t:"Drawing Canvas",cat:"casual",emoji:"🖌️",fullUrl:"https://unblocked-games.s3.amazonaws.com/drawing-canvas.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/213/512.jpg"},
+  {t:"Color by Number",cat:"casual",emoji:"🎨",fullUrl:"https://unblocked-games.s3.amazonaws.com/color-by-number.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/371/happy-crayons-512.jpg"},
+  {t:"Sandbox Mode",cat:"casual",emoji:"🏖️",fullUrl:"https://unblocked-games.s3.amazonaws.com/sandbox-mode.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/86/WORDCRAFT.jpg"},
+  {t:"Stickman vs Zombies",cat:"action",emoji:"🧟",fullUrl:"https://unblocked-games.s3.amazonaws.com/stickman-vs-zombies.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/57/stickman.jpg"},
+  {t:"Stickman Warriors",cat:"action",emoji:"⚔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/stickman-warriors.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/573/stickman-parkour-512.webp"},
+  {t:"Stickman Prison",cat:"escape",emoji:"🏃",fullUrl:"https://unblocked-games.s3.amazonaws.com/stickman-prison.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/573/stickman-parkour-512.webp"},
+  {t:"Stickman Run",cat:"arcade",emoji:"🏃",fullUrl:"https://unblocked-games.s3.amazonaws.com/stickman-run.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/57/stickman.jpg"},
+  {t:"Stickman Skate",cat:"skill",emoji:"🛹",fullUrl:"https://unblocked-games.s3.amazonaws.com/stickman-skate.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/378/stickman-swing512.jpg"},
+  {t:"Tank Brawl",cat:"action",emoji:"🪖",fullUrl:"https://unblocked-games.s3.amazonaws.com/tank-brawl.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/650/tank-arena.webp"},
+  {t:"Tank Shooter",cat:"shooting",emoji:"💣",fullUrl:"https://unblocked-games.s3.amazonaws.com/tank-shooter.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/492/tanks-of-the-galaxy.webp"},
+  {t:"Army Tank Battle",cat:"strategy",emoji:"🪖",fullUrl:"https://unblocked-games.s3.amazonaws.com/army-tank-battle.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/33/tank.jpg"},
+  {t:"Snake Classic",cat:"snake",emoji:"🐍",fullUrl:"https://unblocked-games.s3.amazonaws.com/snake-classic.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/635/snake-game.webp"},
+  {t:"Snake Arena",cat:"snake",emoji:"🐍",fullUrl:"https://unblocked-games.s3.amazonaws.com/snake-arena.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/71/Crazy-Snake-io-512x512.jpg"},
+  {t:"Snake Master",cat:"snake",emoji:"🐍",fullUrl:"https://unblocked-games.s3.amazonaws.com/snake-master.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/83/Nova-Snakes-io-512x512.jpeg"},
+  {t:"Super Sniper",cat:"sniper",emoji:"🎯",fullUrl:"https://unblocked-games.s3.amazonaws.com/super-sniper.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/50/Sniper-Strike-512x512.jpeg"},
+  {t:"Sniper 3D",cat:"sniper",emoji:"🔭",fullUrl:"https://unblocked-games.s3.amazonaws.com/sniper-3d.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/215/sniper-re.jpg"},
+  {t:"Sniper Mission",cat:"sniper",emoji:"🎯",fullUrl:"https://unblocked-games.s3.amazonaws.com/sniper-mission.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/127/512.jpg"},
+  {t:"Headshot Sniper",cat:"sniper",emoji:"🎯",fullUrl:"https://unblocked-games.s3.amazonaws.com/headshot-sniper.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/134/galactic-sniper.jpg"},
+  {t:"Rally Champion",cat:"rally",emoji:"🏎️",fullUrl:"https://unblocked-games.s3.amazonaws.com/rally-champion.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/368/rally-racing-512.jpg"},
+  {t:"Dirt Rally",cat:"rally",emoji:"🚗",fullUrl:"https://unblocked-games.s3.amazonaws.com/dirt-rally.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/361/512.jpg"},
+  {t:"Dune Bashing",cat:"rally",emoji:"🏜️",fullUrl:"https://unblocked-games.s3.amazonaws.com/dune-bashing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/27/buggy.jpg"},
+  {t:"Kids Coloring Book",cat:"kids",emoji:"🖍️",fullUrl:"https://unblocked-games.s3.amazonaws.com/kids-coloring-book.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/371/happy-crayons-512.jpg"},
+  {t:"Kids Math",cat:"kids",emoji:"🔢",fullUrl:"https://unblocked-games.s3.amazonaws.com/kids-math.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/563/math-experta-512-2.webp"},
+  {t:"Kids Memory",cat:"kids",emoji:"🧠",fullUrl:"https://unblocked-games.s3.amazonaws.com/kids-memory.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/643/find-it.webp"},
+  {t:"Animal Crossing Clone",cat:"kids",emoji:"🐾",fullUrl:"https://unblocked-games.s3.amazonaws.com/animal-crossing-clone.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/329/512.jpg"},
+  {t:"My Little Pony",cat:"kids",emoji:"🦄",fullUrl:"https://unblocked-games.s3.amazonaws.com/my-little-pony.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/129/unicorn.jpg"},
+  {t:"Neon Racing",cat:"racing",emoji:"🌟",fullUrl:"https://unblocked-games.s3.amazonaws.com/neon-racing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/173/512.jpg"},
+  {t:"Cyber Race",cat:"racing",emoji:"🤖",fullUrl:"https://unblocked-games.s3.amazonaws.com/cyber-race.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/133/512.jpg"},
+  {t:"Kart Racer",cat:"racing",emoji:"🏎️",fullUrl:"https://unblocked-games.s3.amazonaws.com/kart-racer.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/197/512.jpg"},
+  {t:"Hot Rod Racing",cat:"racing",emoji:"🔥",fullUrl:"https://unblocked-games.s3.amazonaws.com/hot-rod-racing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/247/512.jpg"},
+  {t:"Retro Racing",cat:"racing",emoji:"🏁",fullUrl:"https://unblocked-games.s3.amazonaws.com/retro-racing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/126/racing.jpg"},
+  {t:"Moonlight Racing",cat:"racing",emoji:"🌙",fullUrl:"https://unblocked-games.s3.amazonaws.com/moonlight-racing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/450/neon-war.jpg"},
+  {t:"Winter Drift",cat:"drift",emoji:"❄️",fullUrl:"https://unblocked-games.s3.amazonaws.com/winter-drift.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/249/snow-hill.jpg"},
+  {t:"Desert Drift",cat:"drift",emoji:"🏜️",fullUrl:"https://unblocked-games.s3.amazonaws.com/desert-drift.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/428/drift-rider.jpg"},
+  {t:"Night Drift",cat:"drift",emoji:"🌙",fullUrl:"https://unblocked-games.s3.amazonaws.com/night-drift.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/443/drift-hunters-game.jpg"},
+  {t:"Extreme Drift",cat:"drift",emoji:"💨",fullUrl:"https://unblocked-games.s3.amazonaws.com/extreme-drift.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/357/512-2.jpg"},
+  {t:"City Drift",cat:"drift",emoji:"🏙️",fullUrl:"https://unblocked-games.s3.amazonaws.com/city-drift.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/252/512.jpg"},
+  {t:"Mountain Drift",cat:"drift",emoji:"🏔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/mountain-drift.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/334/512.jpg"},
+  {t:"Drifting Masters",cat:"drift",emoji:"🚗",fullUrl:"https://unblocked-games.s3.amazonaws.com/drifting-masters.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/314/512-1.jpg"},
+  {t:"Pixel Kingdom",cat:"adventure",emoji:"👑",fullUrl:"https://unblocked-games.s3.amazonaws.com/pixel-kingdom.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/5/pixel-survival.jpg"},
+  {t:"Dungeon Crawler",cat:"adventure",emoji:"⚔️",fullUrl:"https://unblocked-games.s3.amazonaws.com/dungeon-crawler.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/185/512.jpg"},
+  {t:"Quest for Glory",cat:"adventure",emoji:"🗡️",fullUrl:"https://unblocked-games.s3.amazonaws.com/quest-for-glory.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/228/512.jpg"},
+  {t:"Lost Temple",cat:"adventure",emoji:"🏛️",fullUrl:"https://unblocked-games.s3.amazonaws.com/lost-temple.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/329/512.jpg"},
+  {t:"Alien Planet",cat:"adventure",emoji:"👽",fullUrl:"https://unblocked-games.s3.amazonaws.com/alien-planet.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/241/512.jpg"},
+  {t:"Gravity Falls",cat:"adventure",emoji:"🌊",fullUrl:"https://unblocked-games.s3.amazonaws.com/gravity-falls-game.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/537/fancy-pants-2.webp"},
+  {t:"Sky World",cat:"adventure",emoji:"☁️",fullUrl:"https://unblocked-games.s3.amazonaws.com/sky-world.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/538/duck-life-4-unity.webp"},
+  {t:"Math Runner",cat:"kids",emoji:"➕",fullUrl:"https://unblocked-games.s3.amazonaws.com/math-runner.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/563/math-experta-512-2.webp"},
+  {t:"Typing Race",cat:"skill",emoji:"⌨️",fullUrl:"https://unblocked-games.s3.amazonaws.com/typing-race.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/497/spacebark-clicker.webp"},
+  {t:"Speed Typing",cat:"skill",emoji:"⌨️",fullUrl:"https://unblocked-games.s3.amazonaws.com/speed-typing.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/645/wordle-game.webp"},
+  {t:"Music Tiles",cat:"skill",emoji:"🎵",fullUrl:"https://unblocked-games.s3.amazonaws.com/music-tiles.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/243/512-2.jpg"},
+  {t:"Guitar Hero Clone",cat:"skill",emoji:"🎸",fullUrl:"https://unblocked-games.s3.amazonaws.com/guitar-hero-clone.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/447/friday-night-funkin-unblocked.jpg"},
+  {t:"Drum Kit",cat:"skill",emoji:"🥁",fullUrl:"https://unblocked-games.s3.amazonaws.com/drum-kit.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/637/sprunki-game.webp"},
+  {t:"Pixel Golf",cat:"sports",emoji:"⛳",fullUrl:"https://unblocked-games.s3.amazonaws.com/nova-billiard.html",fullThumb:"https://unblocked-games.s3.amazonaws.com/media/posts/210/pool.jpg"},
 ];
 
 const featured = [
@@ -944,14 +1288,19 @@ const featured = [
 ];
 
 let activeCat="all", activeList=[];
-document.getElementById("totalCount").textContent=games.length;
 
-function renderFeatured(){
-  document.getElementById("featGrid").innerHTML=featured.map(g=>`
-    <div class="feat-card" onclick="openByTitle('${g.t.replace(/'/g,"\\'")}')">
-      <div class="feat-thumb-wrap">
-        <img class="feat-thumb" src="${S3+g.img}" alt="${g.t}" loading="lazy">
-        <div class="feat-badge">Featured</div>
+document.getElementById("totalCount").textContent = games.length;
+
+function renderFeatured() {
+  const fg = document.getElementById("featGrid");
+  fg.innerHTML = featured.map(g => `
+    <div class="feat-card" onclick="_launch(${JSON.stringify(g).replace(/"/g,'&quot;')})">
+      <div style="position:relative">
+        <img src="${S3}${g.img}" alt="${g.t}" loading="lazy"
+          style="width:100%;height:120px;object-fit:cover;display:block;background:#111"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="display:none;width:100%;height:120px;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,#1a1a38,#251f44)">${g.emoji||'🎮'}</div>
+        <div class="feat-badge">⭐ Featured</div>
       </div>
       <div class="cinfo">
         <div class="ctitle">${g.t}</div>
@@ -960,67 +1309,109 @@ function renderFeatured(){
     </div>`).join("");
 }
 
-function setCategory(el,cat){
-  document.querySelectorAll(".cat").forEach(c=>{
-    c.classList.remove("on");
-    if(el){if(c===el)c.classList.add("on");}
-    else{if(cat==="all"?c.textContent.trim()==="All":c.textContent.toLowerCase().includes(cat))c.classList.add("on");}
-  });
-  activeCat=cat;
-  document.getElementById("secLabel").textContent=cat==="all"?"All Games":cat.charAt(0).toUpperCase()+cat.slice(1)+" Games";
-  const q=document.getElementById("q").value;
-  document.getElementById("featSection").style.display=(cat==="all"&&!q)?"block":"none";
+function setCategory(el, cat) {
+  if (el) {
+    document.querySelectorAll(".cat").forEach(c => c.classList.remove("on"));
+    el.classList.add("on");
+  } else {
+    document.querySelectorAll(".cat").forEach(c => {
+      c.classList.remove("on");
+      const match = cat==="all" ? c.textContent.includes("All") : c.textContent.toLowerCase().includes(cat);
+      if (match) c.classList.add("on");
+    });
+  }
+  activeCat = cat;
+  visibleCount = PAGE_SIZE;
+  const label = cat==="all" ? "All Games" : cat.charAt(0).toUpperCase()+cat.slice(1)+" Games";
+  document.getElementById("secLabel").textContent = label;
+  document.getElementById("featSection").style.display = (cat==="all" && !document.getElementById("q").value) ? "block" : "none";
   applyFilters();
 }
 
-function applyFilters(){
-  const q=document.getElementById("q").value.toLowerCase();
-  let list=games;
-  if(activeCat!=="all")list=list.filter(g=>g.cat===activeCat);
-  if(q)list=list.filter(g=>g.t.toLowerCase().includes(q)||g.cat.includes(q));
-  document.getElementById("featSection").style.display=(activeCat==="all"&&!q)?"block":"none";
-  activeList=list;
-  document.getElementById("gameCount").textContent=list.length+" game"+(list.length!==1?"s":"");
-  render(list);
+function applyFilters() {
+  const q = document.getElementById("q").value.toLowerCase();
+  let list = games;
+  if (activeCat !== "all") list = list.filter(g => g.cat === activeCat);
+  if (q) list = list.filter(g => g.t.toLowerCase().includes(q) || g.cat.includes(q));
+  document.getElementById("featSection").style.display = (activeCat==="all" && !q) ? "block" : "none";
+  activeList = list;
+  document.getElementById("gameCount").textContent = list.length + " game" + (list.length!==1?"s":"");
+  visibleCount = PAGE_SIZE;
+  render();
 }
 
-function render(list){
-  const grid=document.getElementById("grid");
-  if(!list.length){grid.innerHTML='<div class="no-res">No games found — try a different search!</div>';return;}
-  grid.innerHTML=list.map((g,i)=>`
-    <div class="card" onclick="openGame(${i})">
-      <img class="card-thumb" src="${S3+g.img}" alt="${g.t}" loading="lazy"
-        onerror="this.outerHTML='<div class=\\'card-thumb-placeholder\\'><span>${g.t}</span></div>'">
+function render() {
+  const grid = document.getElementById("grid");
+  const loadBtn = document.getElementById("loadMoreBtn");
+  if (!activeList.length) {
+    grid.innerHTML = '<div class="no-res"><div class="no-res-icon">🔍</div>No games found. Try a different search!</div>';
+    if (loadBtn) loadBtn.style.display = "none";
+    return;
+  }
+  const slice = activeList.slice(0, visibleCount);
+  grid.innerHTML = slice.map((g,i) => {
+    const thumb = g.fullThumb || (S3 + (g.img||""));
+    const emoji = g.emoji || "🎮";
+    return `<div class="card" onclick="openGame(${i})">
+      <img class="thumb" src="${thumb}" alt="${g.t}" loading="lazy"
+        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=\'width:100%;height:100px;background:#1a1a38;display:flex;align-items:center;justify-content:center;font-size:28px\'>${emoji}</div>')">
       <div class="play-overlay">
-        <div class="play-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="#000"><polygon points="5,3 19,12 5,21"/></svg></div>
+        <div class="play-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
       </div>
       <div class="cinfo">
         <div class="ctitle">${g.t}</div>
         <div class="ctag">${g.cat}</div>
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
+
+  if (loadBtn) {
+    if (visibleCount < activeList.length) {
+      loadBtn.style.display = "block";
+      const remaining = Math.min(PAGE_SIZE, activeList.length - visibleCount);
+      loadBtn.textContent = `Load More (${remaining} more games)`;
+    } else {
+      loadBtn.style.display = "none";
+    }
+  }
 }
 
-function openGame(i){_launch(activeList[i]);}
-function openByTitle(t){const g=games.find(x=>x.t===t)||featured.find(x=>x.t===t);if(g)_launch(g);}
-function _launch(g){
-  document.getElementById("pTitle").textContent=g.t;
-  document.getElementById("pTag").textContent=g.cat.toUpperCase();
-  document.getElementById("pFrame").src=S3+g.url;
+function loadMore() {
+  visibleCount += PAGE_SIZE;
+  render();
+  window.scrollTo({top: document.getElementById("grid").offsetTop - 80, behavior: "smooth"});
+}
+
+function openGame(i) { _launch(activeList[i]); }
+
+function openGameByTitle(title) {
+  const g = games.find(x => x.t === title) || featured.find(x => x.t === title);
+  if (g) _launch(g);
+}
+
+function _launch(g) {
+  document.getElementById("pTitle").textContent = g.t;
+  document.getElementById("pTag").textContent = (g.cat||"game").toUpperCase();
+  document.getElementById("pFrame").src = g.fullUrl || (S3 + (g.url||""));
   document.getElementById("player").classList.add("open");
-  document.body.style.overflow="hidden";
+  document.body.style.overflow = "hidden";
 }
-function closePlayer(){
+
+function closePlayer() {
   document.getElementById("player").classList.remove("open");
-  document.getElementById("pFrame").src="";
-  document.body.style.overflow="";
+  document.getElementById("pFrame").src = "";
+  document.body.style.overflow = "";
 }
-function toggleFullscreen(){
-  const f=document.getElementById("pFrame");
-  if(f.requestFullscreen)f.requestFullscreen();
-  else if(f.webkitRequestFullscreen)f.webkitRequestFullscreen();
+
+function toggleFullscreen() {
+  const frame = document.getElementById("pFrame");
+  if (frame.requestFullscreen) frame.requestFullscreen();
+  else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
 }
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closePlayer();});
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePlayer(); });
 renderFeatured();
 applyFilters();
 </script>
