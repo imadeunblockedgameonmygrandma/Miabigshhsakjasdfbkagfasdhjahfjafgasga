@@ -1059,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function showProxy() {
     el('proxy-overlay').classList.add('show');
     document.body.style.overflow = 'hidden';
-    loadProxy('https://www.google.com/webhp?igu=1');
+    loadProxy('https://www.google.com');
     el('proxy-url').focus();
   }
 
@@ -1078,7 +1078,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const frame  = el('proxy-frame');
     const status = el('proxy-status');
     el('proxy-url').value = url;
-    frame.src = url;
+
+    // Route through proxy to bypass X-Frame-Options / CSP blocks
+    const proxyServices = [
+      'https://nowsecure.nl/#navigate:',
+      'https://corsproxy.io/?url=',
+    ];
+
+    // Use Google Translate as a reliable unblocker for most sites
+    const proxiedUrl = 'https://translate.google.com/translate?sl=auto&tl=en&u=' + encodeURIComponent(url);
+    frame.src = proxiedUrl;
+
     status.textContent = 'Loading...';
     status.classList.add('show');
     frame.onload = function() {
