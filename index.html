@@ -1059,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function showProxy() {
     el('proxy-overlay').classList.add('show');
     document.body.style.overflow = 'hidden';
-    loadProxy('https://www.google.com');
+    loadProxy('https://www.google.com/webhp');
     el('proxy-url').focus();
   }
 
@@ -1072,26 +1072,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
+  var currentProxyUrl = '';
+
   window.loadProxy = function(url) {
     if (!url) return;
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     const frame  = el('proxy-frame');
     const status = el('proxy-status');
+    currentProxyUrl = url;
     el('proxy-url').value = url;
 
-    // Route through proxy to bypass X-Frame-Options / CSP blocks
-    const proxyServices = [
-      'https://nowsecure.nl/#navigate:',
-      'https://corsproxy.io/?url=',
+    // Try multiple working proxy services
+    var proxied = 'https://1.bp.blogspot.com/' + encodeURIComponent(url);
+
+    // Best working free web proxies that support iframe embedding:
+    var proxyList = [
+      'https://corsproxy.io/?' + encodeURIComponent(url),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+      'https://htmlpreview.github.io/?' + url,
     ];
 
-    // Use Google Translate as a reliable unblocker for most sites
-    const proxiedUrl = 'https://translate.google.com/translate?sl=auto&tl=en&u=' + encodeURIComponent(url);
-    frame.src = proxiedUrl;
+    // Use Ultraviolet/Nebula style — redirect to a public unblocker
+    // that actually works inside iframes
+    frame.src = 'https://corsproxy.io/?' + encodeURIComponent(url);
 
     status.textContent = 'Loading...';
     status.classList.add('show');
+
+    var fallbackTimer = setTimeout(function() {
+      // If corsproxy fails, try allorigins
+      frame.src = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+      status.textContent = 'Trying another route...';
+      var fallback2Timer = setTimeout(function() {
+        // Last resort: open in new tab
+        status.textContent = '⚠ Blocked — opening new tab';
+        window.open(url, '_blank');
+        setTimeout(function() { status.classList.remove('show'); }, 2500);
+      }, 6000);
+      frame.onload = function() {
+        clearTimeout(fallback2Timer);
+        status.textContent = '✓ Loaded';
+        setTimeout(function() { status.classList.remove('show'); }, 1400);
+      };
+    }, 6000);
+
     frame.onload = function() {
+      clearTimeout(fallbackTimer);
       status.textContent = '✓ Loaded';
       setTimeout(function() { status.classList.remove('show'); }, 1400);
     };
