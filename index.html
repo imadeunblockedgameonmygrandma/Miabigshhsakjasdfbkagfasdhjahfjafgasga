@@ -123,19 +123,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .feat-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr))}
 }
 
-/* SECRET POPUP */
-#secret-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease}
-#secret-overlay.show{display:flex}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes popIn{from{transform:scale(0.88) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-#secret-box{background:#272727;border:1px solid #7c6ef5;border-radius:20px;padding:36px 32px 28px;max-width:340px;width:100%;text-align:center;position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.65);animation:popIn 0.25s ease}
-#secret-box .s-icon{font-size:42px;margin-bottom:14px;display:block}
-#secret-box h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#F7F5F0;margin-bottom:10px}
-#secret-box p{font-size:14px;color:#9e9b94;line-height:1.65;margin-bottom:22px}
-#secret-close{background:#7c6ef5;color:#fff;border:none;padding:11px 30px;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.2s;width:100%}
-#secret-close:hover{opacity:0.85}
-#secret-dismiss{position:absolute;top:13px;right:15px;background:none;border:none;color:#6b6860;font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;transition:color 0.2s}
-#secret-dismiss:hover{color:#F7F5F0}
+/* SECRET PROXY */
+#proxy-overlay{position:fixed;inset:0;background:#1F1F1F;z-index:9999;display:none;flex-direction:column}
+#proxy-overlay.show{display:flex}
+#proxy-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#272727;border-bottom:1px solid #383838;flex-shrink:0}
+#proxy-bar .p-logo{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#7c6ef5;flex-shrink:0}
+#proxy-bar .p-logo span{color:#F7F5F0;font-weight:600}
+#proxy-url-wrap{flex:1;display:flex;align-items:center;background:#2e2e2e;border:1px solid #424242;border-radius:10px;padding:7px 12px;gap:8px;transition:border-color 0.2s}
+#proxy-url-wrap:focus-within{border-color:#7c6ef5}
+#proxy-url-wrap svg{flex-shrink:0}
+#proxy-url{background:none;border:none;outline:none;color:#F7F5F0;font-size:13px;width:100%;font-family:'DM Sans',sans-serif}
+#proxy-url::placeholder{color:#6b6860}
+#proxy-go{background:#7c6ef5;color:#fff;border:none;padding:7px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity 0.2s;flex-shrink:0}
+#proxy-go:hover{opacity:0.85}
+#proxy-close-btn{background:#2e2e2e;border:1px solid #424242;color:#F7F5F0;font-size:12px;padding:7px 14px;border-radius:9px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;transition:all 0.2s;flex-shrink:0}
+#proxy-close-btn:hover{background:#f5816e;border-color:#f5816e}
+#proxy-frame{flex:1;width:100%;border:none;background:#111}
+#proxy-status{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(39,39,39,0.95);border:1px solid #383838;color:#9e9b94;font-size:11px;padding:6px 16px;border-radius:20px;pointer-events:none;transition:opacity 0.3s;opacity:0}
+#proxy-status.show{opacity:1}
 </style>
 </head>
 <body>
@@ -1044,70 +1049,89 @@ document.addEventListener("keydown", e => { if (e.key==="Escape") closePlayer();
 renderFeatured();
 applyFilters();
 
-// ── SECRET CODE POPUP ────────────────────────────────────────────
-(function() {
+// ── SECRET PROXY (trigger: search 0000) ─────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
   const SECRET = '0000';
-  const input  = document.getElementById('q');
-  if (!input) return;
+  const searchInput = document.getElementById('q');
 
-  function showSecret() {
-    const overlay = document.getElementById('secret-overlay');
-    if (overlay) {
-      overlay.classList.add('show');
-      document.body.style.overflow = 'hidden';
-      // Re-trigger animation by replacing the box
-      const box = document.getElementById('secret-box');
-      box.style.animation = 'none';
-      box.offsetHeight; // reflow
-      box.style.animation = '';
-    }
+  function el(id) { return document.getElementById(id); }
+
+  function showProxy() {
+    el('proxy-overlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
+    loadProxy('https://www.google.com/webhp?igu=1');
+    el('proxy-url').focus();
   }
 
-  window.closeSecret = function() {
-    const overlay = document.getElementById('secret-overlay');
-    if (overlay) {
-      overlay.classList.remove('show');
-      // Only restore scroll if game player isn't open
-      if (!document.getElementById('player').classList.contains('open')) {
-        document.body.style.overflow = '';
-      }
+  window.closeProxy = function() {
+    el('proxy-overlay').classList.remove('show');
+    el('proxy-frame').src = '';
+    el('proxy-url').value = '';
+    if (!el('player').classList.contains('open')) {
+      document.body.style.overflow = '';
     }
   };
 
-  // Click outside box to close
-  document.getElementById('secret-overlay').addEventListener('click', function(e) {
-    if (e.target === this) closeSecret();
+  window.loadProxy = function(url) {
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    const frame  = el('proxy-frame');
+    const status = el('proxy-status');
+    el('proxy-url').value = url;
+    frame.src = url;
+    status.textContent = 'Loading...';
+    status.classList.add('show');
+    frame.onload = function() {
+      status.textContent = '✓ Loaded';
+      setTimeout(function() { status.classList.remove('show'); }, 1400);
+    };
+  };
+
+  window.proxyGo = function() {
+    const val = el('proxy-url').value.trim();
+    if (val) loadProxy(val);
+  };
+
+  // Enter key triggers Go
+  el('proxy-url').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') proxyGo();
   });
 
-  // ESC also closes secret popup
+  // ESC closes proxy
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeSecret();
+    if (e.key === 'Escape') closeProxy();
   });
 
-  // Watch the search input — exact match only, no partials
-  input.addEventListener('input', function() {
-    const val = this.value;
-    // Must be exactly '0000' — not '000', not '10000', not '00001'
-    if (val === SECRET) {
-      showSecret();
-      // Clear the search so it doesn't filter games
-      setTimeout(() => { this.value = ''; applyFilters(); }, 80);
-    }
-  });
-})();
+  // Search input — exact '0000' match only
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      if (this.value === SECRET) {
+        showProxy();
+        setTimeout(function() {
+          searchInput.value = '';
+          applyFilters();
+        }, 80);
+      }
+    });
+  }
+});
 // ─────────────────────────────────────────────────────────────────
 
 </script>
 
-<!-- SECRET POPUP (trigger: search 0000) -->
-<div id="secret-overlay" role="dialog" aria-modal="true" aria-labelledby="secret-title">
-  <div id="secret-box">
-    <button id="secret-dismiss" onclick="closeSecret()" aria-label="Close">&#x2715;</button>
-    <span class="s-icon">🔐</span>
-    <h2 id="secret-title">You found it.</h2>
-    <p>This is a secret page only visitors who know the code can see. Welcome to the inner circle.</p>
-    <button id="secret-close" onclick="closeSecret()">Got it — close</button>
+<!-- SECRET PROXY (trigger: search 0000) -->
+<div id="proxy-overlay" role="dialog" aria-modal="true" aria-label="Proxy Browser" style="position:relative">
+  <div id="proxy-bar">
+    <div class="p-logo">KERMY'S<span> PROXY</span></div>
+    <div id="proxy-url-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b6860" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <input id="proxy-url" type="text" placeholder="Type a site e.g. google.com" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <button id="proxy-go" onclick="proxyGo()">Go</button>
+    <button id="proxy-close-btn" onclick="closeProxy()">✕ Close</button>
   </div>
+  <iframe id="proxy-frame" src="" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"></iframe>
+  <div id="proxy-status"></div>
 </div>
 
 </body>
